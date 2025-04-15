@@ -1,0 +1,17 @@
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    justify-content: space-between;
+    background-color: #f8f9fa;       
+}
+
+.nav-container {
+   display: flex;
+    justify-content: space-between;
+}
+
+.nav-list {
+    display: flex;
+}
