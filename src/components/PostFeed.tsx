@@ -4,10 +4,11 @@ import { MdOutlinePostAdd } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { AuthService } from "../service/auth/auth.service";
 import { useAuth } from "../context/useAuth";
-import { Post } from "../service/post/Post";
+import { Post } from "../service/interface/Post";
 import PostCard from "./PostCard";
+import { PostService } from "../service/post/post.service";
 
-export default function PostFeed() {
+export default function PostFeed () {
     const navigate = useNavigate();
     const { user } = useAuth();
     const [showMenu, setShowMenu] = useState(false);
@@ -15,55 +16,186 @@ export default function PostFeed() {
     const [posts, setPosts] = useState<Post[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Datos de ejemplo (en una app real vendrían de una API)
     useEffect(() => {
         // Simulamos una carga de datos
-        const dummyPosts: Post[] = [
+         const dummyPosts: Post[] = [
             {
-                id: "1",
-                authorName: "Pepito el Pensante",
-                authorRole: "Full Stack Developer",
+                id: 1,
                 title: "Iniciando el Proyecto de TODO LIST",
                 description: "Este proyecto tratará sobre mejorar la gestión de mi día a día sobre las cosas que hago.",
-                technologies: ["React", "TypeScript", "Node.js"],
-                likes: 24,
-                comments: 5,
-                isStarred: false,
-                imageUrl: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
+                technologies: [
+                    {
+                        idtech: 1,
+                        name: "React",
+                        image: "https://reactjs.org/logo-og.png"
+                    },
+                    {
+                        idtech: 2,
+                        name: "TypeScript",
+                        image: "https://www.typescriptlang.org/assets/images/icons/apple-touch-icon-120x120.png"
+                    },
+                    {
+                        idtech: 3,
+                        name: "Node.js",
+                        image: "https://nodejs.org/static/images/logo.svg"
+                    }
+                ],
+                user: {
+                    iduser: 1,
+                    name: "hola",
+                    last_name: "hola2",
+                    email: "hola@gmail.com",
+                    phone: "222111333",
+                    image: "holaimage",
+                    usuario: "Holausuario"
+                },
+                postStats: 
+                    {
+                        id: 1,
+                        likesCount: 20,
+                        imageUrl: "urlimagen",
+                        starred: true
+                    }
+                ,
+                comments: [
+                    {
+                        id: 1,
+                        content: "¡Qué buen proyecto! Me interesa seguir el avance.",
+                        createdAt: "1 hora atrás"
+                    },
+                    {
+                        id: 2,
+                        content: "Me gustaría aportar con ideas para el diseño.",
+                        createdAt: "30 minutos atrás"
+                    }
+                ],
+                likes: [
+                    {
+                        id: 1,
+                        post: {} as Post, // Se puede reemplazar luego con el post mismo para evitar referencia circular
+                        user: {
+                            iduser: 2,
+                            name: "Usuario2",
+                            last_name: "Apellido2",
+                            email: "usuario2@gmail.com",
+                            phone: "111222333",
+                            image: "image2",
+                            usuario: "usuario_2"
+                        },
+                        createdAt: "1 hora atrás"
+                    },
+                    {
+                        id: 3,
+                        post: {} as Post, // Se puede reemplazar luego con el post mismo para evitar referencia circular
+                        user: {
+                            iduser: 2,
+                            name: "Usuario2",
+                            last_name: "Apellido2",
+                            email: "usuario2@gmail.com",
+                            phone: "111222333",
+                            image: "image2",
+                            usuario: "usuario_2"
+                        },
+                        createdAt: "1 hora atrás"
+                    }
+                ],
                 createdAt: "2 horas atrás"
             },
             {
-                id: "2",
-                authorName: "María Codeadora",
-                authorRole: "Frontend Developer",
-                title: "Nuevos hooks en React 18",
-                description: "Comparto mi experiencia con los nuevos hooks introducidos en la última versión de React.",
-                technologies: ["React", "JavaScript", "Hooks"],
-                likes: 42,
-                comments: 12,
-                isStarred: true,
+                id: 2,
+                title: "Desarrollo de una Red Social Minimalista",
+                description: "Una red social enfocada en compartir momentos importantes sin distracciones.",
+                technologies: [
+                    {
+                        idtech: 1,
+                        name: "Vue.js",
+                        image: "https://vuejs.org/images/logo.png"
+                    },
+                    {
+                        idtech: 2,
+                        name: "Firebase",
+                        image: "https://firebase.google.com/static/images/brand-guidelines/logo-logomark.png"
+                    },
+                    {
+                        idtech: 3,
+                        name: "Tailwind CSS",
+                        image: "https://tailwindcss.com/favicons/apple-touch-icon.png"
+                    }
+                ],
+                user: {
+                    iduser: 3,
+                    name: "Carlos",
+                    last_name: "Gómez",
+                    email: "carlos@gmail.com",
+                    phone: "555444333",
+                    image: "carlos_image",
+                    usuario: "carlos_dev"
+                },
+                postStats: 
+                    {
+                        id: 2,
+                        likesCount: 45,
+                        imageUrl: "url_imagen_red_social",
+                        starred: true
+                    }
+                ,
+                comments: [
+                    {
+                        id: 3,
+                        content: "Me encanta la idea de una red social minimalista. ¡Éxito!",
+                        createdAt: "3 horas atrás"
+                    },
+                    {
+                        id: 4,
+                        content: "¿Pensaste en integrar mensajes privados?",
+                        createdAt: "1 hora atrás"
+                    }
+                ],
+                likes: [
+                    {
+                        id: 1,
+                        post: {} as Post,
+                        user: {
+                            iduser: 4,
+                            name: "Ana",
+                            last_name: "López",
+                            email: "ana@gmail.com",
+                            phone: "777888999",
+                            image: "ana_image",
+                            usuario: "ana_design"
+                        },
+                        
+                        
+                        createdAt: "2 horas atrás"
+                    }
+                ],
                 createdAt: "5 horas atrás"
-            },
-            {
-                id: "3",
-                authorName: "Juan Desarrollador",
-                authorRole: "Backend Engineer",
-                title: "Optimizando consultas SQL",
-                description: "Algunos tips para optimizar tus consultas SQL y mejorar el rendimiento de tu aplicación.",
-                technologies: ["SQL", "PostgreSQL", "Optimización"],
-                likes: 18,
-                comments: 3,
-                isStarred: false,
-                imageUrl: "https://images.unsplash.com/photo-1547658719-da2b51169166?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
-                createdAt: "1 día atrás"
             }
-        ];
+
+        ]; 
+        
+        const fetchData = async () => {
+            try {
+                // Obtenemos los posts reales
+                const dataPosts: Post[] = await PostService.getAllPosts();
+                
+                // Usamos los posts reales o los dummy si no hay datos
+                setPosts(dataPosts.length > 0 ? dataPosts : dummyPosts);
+            } catch (error) {
+                console.error("Error fetching posts:", error);
+                setPosts(dummyPosts);
+            } finally {
+                setIsLoading(false);
+            }
+        };
 
         setTimeout(() => {
-            setPosts(dummyPosts);
             setIsLoading(false);
+            fetchData(); // Llamamos a la función para obtener los datos reales
         }, 1000); // Simulamos un delay de carga
     }, []);
+
+    console.log(posts)
 
     // Cerrar menú al hacer clic fuera
     useEffect(() => {
@@ -108,9 +240,9 @@ export default function PostFeed() {
                                 <button className="block w-full text-left px-4 py-2 hover:bg-gray-100">
                                     My Account
                                 </button>
-                                <button 
-                                onClick={onLogout}
-                                className="block w-full text-left px-4 py-2 hover:bg-gray-100">
+                                <button
+                                    onClick={onLogout}
+                                    className="block w-full text-left px-4 py-2 hover:bg-gray-100">
                                     Logout
                                 </button>
                             </div>
@@ -130,9 +262,9 @@ export default function PostFeed() {
                         />
                         <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                     </div>
-                    <button 
-                    onClick={handleCreatePost}
-                    className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                    <button
+                        onClick={handleCreatePost}
+                        className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
                         <MdOutlinePostAdd className="text-xl" />
                         Crear post
                     </button>
@@ -149,15 +281,13 @@ export default function PostFeed() {
                             <PostCard
                                 key={post.id}
                                 id={post.id}
-                                authorName={post.authorName}
-                                authorRole={post.authorRole}
                                 title={post.title}
                                 description={post.description}
                                 technologies={post.technologies}
-                                likes={post.likes}
+                                user={post.user}
+                                postStats={post.postStats}
                                 comments={post.comments}
-                                isStarred={post.isStarred}
-                                imageUrl={post.imageUrl}
+                                likes={post.likes}
                                 createdAt={post.createdAt}
                             />
                         ))

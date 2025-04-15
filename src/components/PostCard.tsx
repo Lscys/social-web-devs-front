@@ -1,32 +1,19 @@
 import { FaUserCircle, FaThumbsUp, FaCommentDots, FaStar } from "react-icons/fa";
-
-interface PostCardProps {
-  id: string;
-  authorName: string;
-  authorRole: string;
-  title: string;
-  description: string;
-  technologies: string[];
-  likes: number;
-  comments: number;
-  isStarred: boolean;
-  imageUrl?: string;
-  createdAt: string;
-}
+import { Post } from "../service/interface/Post";
 
 export default function PostCard({
   id,
-  authorName,
-  authorRole,
   title,
   description,
   technologies,
-  likes,
+  user,
+  postStats,
   comments,
-  isStarred,
-  imageUrl,
+  likes,
   createdAt,
-}: PostCardProps) {
+}: Post) {
+  console.log("Post Stats:", postStats);
+  const imageUrl = postStats?.imageUrl?.trim() || "";
   return (
     <div className="bg-white rounded-xl p-4 shadow mb-4">
       {/* Header usuario */}
@@ -34,10 +21,9 @@ export default function PostCard({
         <FaUserCircle className="text-3xl text-gray-500" />
         <div className="flex-1">
           <div className="flex justify-between items-center">
-            <p className="font-semibold">{authorName}</p>
+            <p className="font-semibold">{user.name} {user.last_name}</p>
             <span className="text-xs text-gray-500">{createdAt}</span>
           </div>
-          <p className="text-sm text-gray-500">{authorRole}</p>
         </div>
       </div>
 
@@ -47,10 +33,16 @@ export default function PostCard({
         <p className="text-gray-700">{description}</p>
       </div>
 
-      {/* Imagen o recurso */}
-      {imageUrl && (
+      {/* Imagen del post si existe */}
+      {/* {imageUrl && (
         <div className="bg-gray-200 h-48 rounded-md mb-4 overflow-hidden">
           <img src={imageUrl} alt={title} className="w-full h-full object-cover" />
+        </div>
+      )} */}
+       {/* Imagen del post si existe */}
+       {imageUrl && imageUrl !== "" && (
+        <div className="bg-gray-200 h-48 rounded-md mb-4 overflow-hidden">
+          <img src={imageUrl.toString()} alt={title} className="w-full h-full object-cover" />
         </div>
       )}
 
@@ -59,9 +51,9 @@ export default function PostCard({
         <div className="mb-3">
           <p className="font-semibold mb-1">Tecnologías</p>
           <div className="flex flex-wrap gap-2">
-            {technologies.map((tech, index) => (
-              <span key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
-                {tech}
+            {technologies.map((tech) => (
+              <span key={tech.idtech} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                {tech.name}
               </span>
             ))}
           </div>
@@ -71,12 +63,12 @@ export default function PostCard({
       {/* Acciones */}
       <div className="flex items-center gap-4 mt-4">
         <button className="flex items-center gap-1 text-gray-600 hover:text-blue-500">
-          <FaThumbsUp /> <span>{likes}</span>
+          <FaThumbsUp /> <span>{likes.length}</span>
         </button>
         <button className="flex items-center gap-1 text-gray-600 hover:text-blue-500">
-          <FaCommentDots /> <span>{comments}</span>
+          <FaCommentDots /> <span>{comments.length}</span>
         </button>
-        <button className={`flex items-center gap-1 ${isStarred ? 'text-yellow-400' : 'text-gray-600 hover:text-yellow-400'}`}>
+        <button className={`flex items-center gap-1 ${postStats.starred ? 'text-yellow-400' : 'text-gray-600 hover:text-yellow-400'}`}>
           <FaStar />
         </button>
         <input

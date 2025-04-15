@@ -7,5 +7,12 @@ export const ENDPOINTS = {
     },
     USER: '/users',
     PRODUCTS: '/products',
+    POST: {
+        GET_ALL_POSTS: '/post/all',
+        GET_POST: (id: number) => `/posts/${id}`,
+        CREATE_POST: '/post/create',
+        UPDATE_POST: (id: number) => `/posts/${id}`,
+        DELETE_POST: (id: number) => `/posts/${id}`
+    }
     // ... otros endpoints
 };

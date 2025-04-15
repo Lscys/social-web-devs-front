@@ -1,6 +1,6 @@
 // 1. Tipo para los datos del usuario
 export interface User {
-    iduser: string;
+    iduser: number;
     name: string;
     last_name: string; // o usa un enum si prefieres
     email: string;
