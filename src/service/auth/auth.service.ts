@@ -1,7 +1,7 @@
 import { apiClient } from '../api/apiClient';
 import { ENDPOINTS } from '../api/endpoints';
 import { TokenService } from '../api/token.service';
-import { Credential } from '../interface/Credential';
+import { Credential, RegisterCredential } from '../interface/Credential';
 import { RefreshTokenResponse, Tokens } from '../interface/Tokens';
 import { User } from '../interface/User';
 
@@ -25,7 +25,7 @@ export const AuthService = {
         }
     },
 
-    register: async (userData: User) => {
+    register: async (userData: RegisterCredential) => {
         return apiClient.post(ENDPOINTS.AUTH.REGISTER, userData);
     },
 

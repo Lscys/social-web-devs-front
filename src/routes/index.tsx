@@ -13,6 +13,7 @@ import PrivateRoute from './PrivateRoute';
 import Register from '../pages/auth/Register';
 import { ForgotPassword } from '../pages/auth/ForgotPassword';
 import { Post } from '../pages/web/Post';
+import DetailsAccount from '../pages/user/DetailsAccount';
 
 
 const AppRoutes = () => {
@@ -32,6 +33,7 @@ const AppRoutes = () => {
                 {/* Rutas privadas */}
                 <Route element={<PrivateRoute />}>
                     <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/profile" element={<DetailsAccount />} />
                 </Route>
 
                 {/* Ruta para 404 */}

@@ -33,12 +33,6 @@ export default function PostCard({
         <p className="text-gray-700">{description}</p>
       </div>
 
-      {/* Imagen del post si existe */}
-      {/* {imageUrl && (
-        <div className="bg-gray-200 h-48 rounded-md mb-4 overflow-hidden">
-          <img src={imageUrl} alt={title} className="w-full h-full object-cover" />
-        </div>
-      )} */}
        {/* Imagen del post si existe */}
        {imageUrl && imageUrl !== "" && (
         <div className="bg-gray-200 h-48 rounded-md mb-4 overflow-hidden">

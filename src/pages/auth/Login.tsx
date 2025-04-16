@@ -6,7 +6,7 @@ import { useAuth } from '../../context/useAuth';
 
 export default function Login() {
     const navigate = useNavigate();
-    const { user, setUser } = useAuth();
+    const { user, setUser, setIsAuthenticated } = useAuth();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState<string | null>(null);
@@ -23,7 +23,11 @@ export default function Login() {
             await AuthService.login(credentials);
 
             const userData = await AuthService.me();
-            setUser(userData);
+
+            if (userData) {
+                setUser(userData);
+                setIsAuthenticated(true);
+            }
 
             // Redirigir al usuario después del login exitoso
             navigate('/social');

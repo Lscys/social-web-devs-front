@@ -8,6 +8,7 @@ import { AuthService } from "../service/auth/auth.service";
 // 2. Tipo para el contexto
 interface AuthContextType {
   isAuthenticated: boolean;
+  setIsAuthenticated: (isAuthenticated: boolean) => void;
   user: User | null;
   setUser: (user: User | null) => void;
   login: (userData: User) => void;
@@ -62,7 +63,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, setUser, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated,setIsAuthenticated,user, setUser, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,14 +1,15 @@
 import { useContext } from "react";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 
 const PublicRoute = () => {
-    const { user, isAuthenticated, login, logout } = useAuth();
+    const { user, isAuthenticated } = useAuth();
+    const location = useLocation();
 
-  // Si el usuario está autenticado, redirige al dashboard
-  if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
-  }
+    // Si el usuario está logueado y está en "/", redirigirlo a /social
+    if (isAuthenticated && location.pathname === "/login") {
+        return <Navigate to="/social" replace />;
+    }
 
   return <Outlet />;
 };

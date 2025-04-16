@@ -1,16 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import { FaUserCircle, FaThumbsUp, FaCommentDots, FaStar, FaFilter, FaBell, FaUser, FaSearch } from "react-icons/fa";
 import { MdOutlinePostAdd } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
+import { Navigate, replace, useNavigate } from "react-router-dom";
 import { AuthService } from "../service/auth/auth.service";
 import { useAuth } from "../context/useAuth";
 import { Post } from "../service/interface/Post";
 import PostCard from "./PostCard";
 import { PostService } from "../service/post/post.service";
 
-export default function PostFeed () {
+export default function PostFeed() {
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { user, isAuthenticated } = useAuth();
     const [showMenu, setShowMenu] = useState(false);
     const menuRef = useRef<HTMLDivElement | null>(null);
     const [posts, setPosts] = useState<Post[]>([]);
@@ -18,7 +18,7 @@ export default function PostFeed () {
 
     useEffect(() => {
         // Simulamos una carga de datos
-         const dummyPosts: Post[] = [
+        const dummyPosts: Post[] = [
             {
                 id: 1,
                 title: "Iniciando el Proyecto de TODO LIST",
@@ -49,13 +49,13 @@ export default function PostFeed () {
                     image: "holaimage",
                     usuario: "Holausuario"
                 },
-                postStats: 
-                    {
-                        id: 1,
-                        likesCount: 20,
-                        imageUrl: "urlimagen",
-                        starred: true
-                    }
+                postStats:
+                {
+                    id: 1,
+                    likesCount: 20,
+                    imageUrl: "urlimagen",
+                    starred: true
+                }
                 ,
                 comments: [
                     {
@@ -131,13 +131,13 @@ export default function PostFeed () {
                     image: "carlos_image",
                     usuario: "carlos_dev"
                 },
-                postStats: 
-                    {
-                        id: 2,
-                        likesCount: 45,
-                        imageUrl: "url_imagen_red_social",
-                        starred: true
-                    }
+                postStats:
+                {
+                    id: 2,
+                    likesCount: 45,
+                    imageUrl: "url_imagen_red_social",
+                    starred: true
+                }
                 ,
                 comments: [
                     {
@@ -164,21 +164,21 @@ export default function PostFeed () {
                             image: "ana_image",
                             usuario: "ana_design"
                         },
-                        
-                        
+
+
                         createdAt: "2 horas atrás"
                     }
                 ],
                 createdAt: "5 horas atrás"
             }
 
-        ]; 
-        
+        ];
+
         const fetchData = async () => {
             try {
                 // Obtenemos los posts reales
                 const dataPosts: Post[] = await PostService.getAllPosts();
-                
+
                 // Usamos los posts reales o los dummy si no hay datos
                 setPosts(dataPosts.length > 0 ? dataPosts : dummyPosts);
             } catch (error) {
@@ -209,9 +209,16 @@ export default function PostFeed () {
     }, []);
 
     const handleCreatePost = () => {
-        // Lógica para crear un nuevo post
+        
         console.log("Crear nuevo post");
     };
+
+    const onProfile = () => {
+        console.log(isAuthenticated)
+        if (isAuthenticated && location.pathname === "/social") {
+            navigate("/profile");
+        }
+    }
 
     const onLogout = () => {
         AuthService.logout();
@@ -229,15 +236,25 @@ export default function PostFeed () {
                     </button>
                     <FaCommentDots className="text-2xl" />
                     <FaBell className="text-2xl" />
-                    {/* <FaUser className="text-2xl" /> */}
                     <div className="relative" ref={menuRef}>
-                        <FaUser
-                            className="text-2xl cursor-pointer"
-                            onClick={() => setShowMenu(!showMenu)}
-                        />
+                        {user?.image ? (
+                            <img
+                                src={user.image}
+                                alt="Profile"
+                                onClick={() => setShowMenu(!showMenu)}
+                                className="w-8 h-8 rounded-full cursor-pointer object-cover"
+                            />
+                        ) : (
+                            <FaUser
+                                className="text-2xl cursor-pointer"
+                                onClick={() => setShowMenu(!showMenu)}
+                            />
+                        )}
                         {showMenu && (
                             <div className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md py-2 z-50">
-                                <button className="block w-full text-left px-4 py-2 hover:bg-gray-100">
+                                <button 
+                                onClick={onProfile}
+                                className="block w-full text-left px-4 py-2 hover:bg-gray-100">
                                     My Account
                                 </button>
                                 <button
