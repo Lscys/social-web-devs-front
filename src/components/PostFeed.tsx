@@ -7,14 +7,16 @@ import { useAuth } from "../context/useAuth";
 import { Post } from "../service/interface/Post";
 import PostCard from "./PostCard";
 import { PostService } from "../service/post/post.service";
+import CreatePostModal from './post/modal/CreatePostModal';
 
 export default function PostFeed() {
     const navigate = useNavigate();
-    const { user, isAuthenticated } = useAuth();
+    const { user, isAuthenticated, setIsAuthenticated } = useAuth();
     const [showMenu, setShowMenu] = useState(false);
     const menuRef = useRef<HTMLDivElement | null>(null);
     const [posts, setPosts] = useState<Post[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [ showCreateModal, setShowCreateModal ] = useState(false);
 
     useEffect(() => {
         // Simulamos una carga de datos
@@ -209,18 +211,19 @@ export default function PostFeed() {
     }, []);
 
     const handleCreatePost = () => {
-        
+        setShowCreateModal(true);
         console.log("Crear nuevo post");
     };
 
     const onProfile = () => {
         console.log(isAuthenticated)
-        if (isAuthenticated && location.pathname === "/social") {
+        if (isAuthenticated) {
             navigate("/profile");
         }
     }
 
     const onLogout = () => {
+        setIsAuthenticated(false);
         AuthService.logout();
         navigate("/");
     }
@@ -315,6 +318,7 @@ export default function PostFeed() {
                     )}
                 </div>
             </div>
+            <CreatePostModal open={showCreateModal} onClose={() => setShowCreateModal(false)}/>
         </div>
     );
 }

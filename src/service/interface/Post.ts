@@ -42,7 +42,7 @@ export interface Likes {
 export interface PostRequest {
     title: string;
     description: string;
-    technologiesIds: string[];
+    technologiesIds: Number[];
     userId: number;
     imageUrl: string;
 }

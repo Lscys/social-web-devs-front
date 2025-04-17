@@ -3,19 +3,18 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AuthService } from '../../service/auth/auth.service';
 import { Credential } from '../../service/interface/Credential';
 import { useAuth } from '../../context/useAuth';
+import { toast } from 'sonner';
 
 export default function Login() {
     const navigate = useNavigate();
     const { user, setUser, setIsAuthenticated } = useAuth();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        setError(null);
 
         const credentials: Credential = { email, password };
 
@@ -29,11 +28,18 @@ export default function Login() {
                 setIsAuthenticated(true);
             }
 
-            // Redirigir al usuario después del login exitoso
+            toast.success('Inicio de session con éxito', {
+                description: 'Correo y contraseña correctos',
+                duration: 4000,
+            });
+
             navigate('/social');
         } catch (err) {
             console.error(err);
-            setError('Credenciales inválidas o error de servidor.');
+            toast.error('Credenciales inválidas', {
+                description: 'Correo u contraseña incorrectos',
+                duration: 4000,
+            });
         } finally {
             setLoading(false);
         }

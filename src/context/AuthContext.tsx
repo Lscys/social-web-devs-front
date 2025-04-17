@@ -1,7 +1,6 @@
 import { createContext, useState, useEffect, ReactNode } from "react";
 import { User } from "../service/interface/User";
 import { TokenService } from "../service/api/token.service";
-import { apiClient } from "../service/api/apiClient";
 import { AuthService } from "../service/auth/auth.service";
 
 
@@ -13,6 +12,7 @@ interface AuthContextType {
   setUser: (user: User | null) => void;
   login: (userData: User) => void;
   logout: () => void;
+  isLoading: boolean;
 }
 
 // 3. Crear el contexto con tipo explícito
@@ -24,6 +24,8 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
+  const [isLoading, setIsLoading] = useState(true);
+
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return !!localStorage.getItem("user");
   });
@@ -36,13 +38,21 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const fetchUser = async () => {
     try {
       const token = TokenService.getToken();
-      if (!token) return;
+      if (!token) {
+        setIsLoading(false); // No token, terminar carga
+        return;
+      }
       
       const data = await AuthService.me();
+      setIsAuthenticated(true)
       setUser(data)
     } catch (error) {
       console.error('Error al cargar usuario logueado:', error);
       TokenService.clearTokens();
+      setIsAuthenticated(false);
+      setUser(null);
+    } finally {
+      setIsLoading(false); // 👈 Importantísimo
     }
   };
 
@@ -63,7 +73,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated,setIsAuthenticated,user, setUser, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated,setIsAuthenticated,user, setUser, login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

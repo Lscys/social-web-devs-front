@@ -1,19 +1,20 @@
-import React, { useContext } from 'react'
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 
 const PrivateRoute = () => {
-    const { user, isAuthenticated, login, logout } = useAuth();
+    const { isAuthenticated, isLoading } = useAuth();
+
+    if (isLoading) return null;
 
     if (!isAuthenticated) {
         return <Navigate to="/login" replace />;
     }
 
     // Verifica roles si es necesario
-    const hasAccess = true; // Lógica de permisos personalizada
+    /* const hasAccess = true; // Lógica de permisos personalizada
     if (!hasAccess) {
         return <Navigate to="/unauthorized" replace />;
-    }
+    } */
 
     return <Outlet />;
 }

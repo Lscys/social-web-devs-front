@@ -5,8 +5,8 @@ import { Credential, RegisterCredential } from '../interface/Credential';
 import { RefreshTokenResponse, Tokens } from '../interface/Tokens';
 import { User } from '../interface/User';
 
-
 export const AuthService = {
+    
     login: async (credentials: Credential): Promise<void> => {
         try {
             const response = await apiClient.post<Tokens>(ENDPOINTS.AUTH.LOGIN, credentials);

@@ -7,6 +7,13 @@ export const ENDPOINTS = {
     },
     USER: '/users',
     PRODUCTS: '/products',
+    TECHNOLOGIES: {
+        GET_ALL: '/technologies/all',
+        GET_ONE: (id: number) => `/technologies/${id}`,
+        CREATE: '/technologies/create',
+        UPDATE: (id: number) => `/technologies/${id}`,
+        DELETE: (id: number) => `/technologies/${id}`
+    },
     POST: {
         GET_ALL_POSTS: '/post/all',
         GET_POST: (id: number) => `/posts/${id}`,

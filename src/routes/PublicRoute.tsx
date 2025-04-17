@@ -1,10 +1,11 @@
-import { useContext } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 
 const PublicRoute = () => {
-    const { user, isAuthenticated } = useAuth();
+    const { isAuthenticated, isLoading } = useAuth();
     const location = useLocation();
+
+    if (isLoading) return null;
 
     // Si el usuario está logueado y está en "/", redirigirlo a /social
     if (isAuthenticated && location.pathname === "/login") {
