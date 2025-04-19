@@ -181,8 +181,10 @@ export default function PostFeed() {
                 // Obtenemos los posts reales
                 const dataPosts: Post[] = await PostService.getAllPosts();
 
+                console.log("oli caca", dataPosts)
+
                 // Usamos los posts reales o los dummy si no hay datos
-                setPosts(dataPosts.length > 0 ? dataPosts : dummyPosts);
+                setPosts(dataPosts);
             } catch (error) {
                 console.error("Error fetching posts:", error);
                 setPosts(dummyPosts);
@@ -316,20 +318,9 @@ export default function PostFeed() {
                                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
                             </div>
                         ) : posts.length > 0 ? (
-                            posts.map(post => (
-                                <PostCard
-                                    key={post.id}
-                                    id={post.id}
-                                    title={post.title}
-                                    description={post.description}
-                                    technologies={post.technologies}
-                                    user={post.user}
-                                    postStats={post.postStats}
-                                    comments={post.comments}
-                                    likes={post.likes}
-                                    createdAt={post.createdAt}
-                                />
-                            ))
+                            Array.isArray(posts) && posts.map((post) => (
+                                <PostCard key={post.idrelease} post={post}/>
+                              ))
                         ) : (
                             <div className="bg-white rounded-xl p-8 text-center">
                                 <p className="text-gray-500">No hay posts disponibles</p>

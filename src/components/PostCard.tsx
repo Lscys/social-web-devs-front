@@ -2,18 +2,29 @@ import { FaUserCircle, FaThumbsUp, FaCommentDots, FaStar } from "react-icons/fa"
 import { Post } from "../service/interface/Post";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale"
+import { LikeButton } from "./LikeButton";
+import { useAuth } from "@/context/useAuth";
 
-export default function PostCard({
-    id,
-    title,
-    description,
-    technologies,
-    user,
-    postStats,
-    comments,
-    likes,
-    createdAt,
-}: Post) {
+type Props = {
+    post: Post;
+};
+
+
+export default function PostCard({ post }: Props) {
+
+    const {
+        idrelease,
+        title,
+        description,
+        technologies,
+        user,
+        postStats,
+        comments,
+        likes,
+        createdAt
+    } = post;
+
+    const { user: currentUser } = useAuth();
     const imageUrl = postStats?.imageUrl?.trim() || "";
 
     return (
@@ -77,10 +88,11 @@ export default function PostCard({
 
             {/* Acciones */}
             <div className="flex items-center gap-5 border-t pt-4 mt-4">
-                <button className="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition">
+                {/* <button className="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition">
                     <FaThumbsUp className="text-sm" />
                     <span className="text-sm">{likes.length}</span>
-                </button>
+                </button> */}
+                <LikeButton postId={idrelease} postLike={postStats} currentUserId={currentUser?.iduser!}></LikeButton>
 
                 <button className="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition">
                     <FaCommentDots className="text-sm" />

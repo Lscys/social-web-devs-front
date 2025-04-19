@@ -1,7 +1,7 @@
 import { User } from "./User";
 
 export interface Post {
-    id: number;
+    idrelease: number;
     title: string;
     description: string;
     technologies: Technologies[];
@@ -37,7 +37,6 @@ export interface Likes {
     user: User;
     createdAt: string;
 }
-
 
 export interface PostRequest {
     title: string;
