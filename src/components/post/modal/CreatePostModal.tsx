@@ -17,8 +17,6 @@ interface CreatePostModalProps {
     onClose: () => void;
 }
 
-/* const technologies = ['React', 'Vue', 'Angular', 'Svelte']; */
-
 
 const CreatePostModal: React.FC<CreatePostModalProps> = ({ open, onClose }) => {
     const { user } = useAuth();
@@ -113,12 +111,38 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ open, onClose }) => {
                                 setSelectedTechnologies((prev) => [...prev, id]);
                             }
                         }}>
+                            <div className="flex flex-wrap gap-2 mt-2">
+                                {selectedTechnologies.map((techId) => {
+                                    const tech = technologies?.find(t => t.idtech === techId);
+                                    if (!tech) return null;
+                                    return (
+                                        <div
+                                            key={techId}
+                                            className="flex items-center gap-1 px-3 py-1 bg-white border border-gray-300 rounded-full text-sm text-gray-800 shadow-sm hover:shadow-md transition duration-200"
+                                        >
+                                            {tech.name}
+                                            <button
+                                                onClick={() =>
+                                                    setSelectedTechnologies((prev) => prev.filter((id) => id !== techId))
+                                                }
+                                                className="ml-1 text-gray-500 hover:text-red-500 transition"
+                                            >
+                                                <FaTimes size={12} />
+                                            </button>
+                                        </div>
+                                    );
+                                })}
+                            </div>
                             <SelectTrigger>
                                 <SelectValue placeholder="Tecnologías" />
                             </SelectTrigger>
                             <SelectContent>
                                 {technologies?.map((tech) => (
-                                    <SelectItem key={tech.idtech} value={tech.idtech.toString()}>
+                                    <SelectItem
+                                        key={tech.idtech}
+                                        value={tech.idtech.toString()}
+                                        disabled={selectedTechnologies.includes(tech.idtech)} // Deshabilita si ya está seleccionada
+                                    >
                                         {tech.name}
                                     </SelectItem>
                                 ))}

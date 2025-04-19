@@ -4,9 +4,7 @@ import PostFeed from '../../components/PostFeed'
 export const Post = () => {
   return (
     <div>
-
         <PostFeed />
-
     </div>
   )
 }

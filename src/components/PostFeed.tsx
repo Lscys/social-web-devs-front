@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { FaUserCircle, FaThumbsUp, FaCommentDots, FaStar, FaFilter, FaBell, FaUser, FaSearch } from "react-icons/fa";
 import { MdOutlinePostAdd } from "react-icons/md";
-import { Navigate, replace, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { AuthService } from "../service/auth/auth.service";
 import { useAuth } from "../context/useAuth";
 import { Post } from "../service/interface/Post";
@@ -16,7 +16,7 @@ export default function PostFeed() {
     const menuRef = useRef<HTMLDivElement | null>(null);
     const [posts, setPosts] = useState<Post[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [ showCreateModal, setShowCreateModal ] = useState(false);
+    const [showCreateModal, setShowCreateModal] = useState(false);
 
     useEffect(() => {
         // Simulamos una carga de datos
@@ -212,11 +212,9 @@ export default function PostFeed() {
 
     const handleCreatePost = () => {
         setShowCreateModal(true);
-        console.log("Crear nuevo post");
     };
 
     const onProfile = () => {
-        console.log(isAuthenticated)
         if (isAuthenticated) {
             navigate("/profile");
         }
@@ -229,7 +227,7 @@ export default function PostFeed() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 p-4">
+        <div className="min-w-full min-h-full bg-gray-100 pt-4 pr-4 pl-4">
             {/* Topbar */}
             <header className="flex justify-between items-center bg-white p-4 shadow rounded-md">
                 <div className="text-2xl font-bold">DEVS</div>
@@ -255,9 +253,9 @@ export default function PostFeed() {
                         )}
                         {showMenu && (
                             <div className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md py-2 z-50">
-                                <button 
-                                onClick={onProfile}
-                                className="block w-full text-left px-4 py-2 hover:bg-gray-100">
+                                <button
+                                    onClick={onProfile}
+                                    className="block w-full text-left px-4 py-2 hover:bg-gray-100">
                                     My Account
                                 </button>
                                 <button
@@ -271,54 +269,76 @@ export default function PostFeed() {
                 </div>
             </header>
 
-            {/* Search & Create post */}
-            <div className="mt-6 max-w-4xl mx-auto">
-                <div className="flex justify-between mb-4">
-                    <div className="relative w-2/3">
-                        <input
-                            type="text"
-                            placeholder="Search"
-                            className="w-full border border-gray-300 rounded-md py-2 px-4"
-                        />
-                        <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                    </div>
-                    <button
-                        onClick={handleCreatePost}
-                        className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-                        <MdOutlinePostAdd className="text-xl" />
-                        Crear post
-                    </button>
-                </div>
 
-                {/* Listado de Posts */}
-                <div className="space-y-4">
-                    {isLoading ? (
-                        <div className="flex justify-center items-center h-64">
-                            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            <div className="flex h-[calc(100vh-80px)] overflow-hidden">
+                <aside className="w-64 bg-black rounded-2xl text-white min-h-[90%] max-h-[100%] flex-shrink-0 p-6 mt-2.5 mb-2.5 flex flex-col gap-6">
+                    <div className="text-xl font-bold mb-6">DEVS</div>
+                    <nav className="space-y-4">
+                        <div className="flex items-center gap-3 hover:bg-gray-800 p-2 rounded cursor-pointer">
+                            <FaUserCircle />
+                            <span>Inicio</span>
                         </div>
-                    ) : posts.length > 0 ? (
-                        posts.map(post => (
-                            <PostCard
-                                key={post.id}
-                                id={post.id}
-                                title={post.title}
-                                description={post.description}
-                                technologies={post.technologies}
-                                user={post.user}
-                                postStats={post.postStats}
-                                comments={post.comments}
-                                likes={post.likes}
-                                createdAt={post.createdAt}
+                        <div className="flex items-center gap-3 hover:bg-gray-800 p-2 rounded cursor-pointer">
+                            <FaSearch />
+                            <span>Buscar</span>
+                        </div>
+                        <div className="flex items-center gap-3 hover:bg-gray-800 p-2 rounded cursor-pointer">
+                            <MdOutlinePostAdd />
+                            <span>Crear</span>
+                        </div>
+                        {/* Agrega más ítems según la imagen */}
+                    </nav>
+                </aside>
+                {/* Search & Create post */}
+                <div className="mt-6 mb-20 flex-1 max-w-6xl max-h-full mx-auto px-6">
+                    <div className="flex justify-between mb-4">
+                        <div className="relative w-2/3">
+                            <input
+                                type="text"
+                                placeholder="Search"
+                                className="w-full border border-gray-300 rounded-md py-2 px-4"
                             />
-                        ))
-                    ) : (
-                        <div className="bg-white rounded-xl p-8 text-center">
-                            <p className="text-gray-500">No hay posts disponibles</p>
+                            <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                         </div>
-                    )}
+                        <button
+                            onClick={handleCreatePost}
+                            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                            <MdOutlinePostAdd className="text-xl" />
+                            Crear post
+                        </button>
+                    </div>
+
+                    {/* <div className="flex-1 max-w-6xl mx-auto px-6 h-full overflow-y-auto mt-6"> */}
+                    {/* Listado de Posts */}
+                    <div className="space-y-4 flex-1 max-w-6xl mx-auto h-full overflow-y-auto mt-6">
+                        {isLoading ? (
+                            <div className="flex justify-center items-center h-64">
+                                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                            </div>
+                        ) : posts.length > 0 ? (
+                            posts.map(post => (
+                                <PostCard
+                                    key={post.id}
+                                    id={post.id}
+                                    title={post.title}
+                                    description={post.description}
+                                    technologies={post.technologies}
+                                    user={post.user}
+                                    postStats={post.postStats}
+                                    comments={post.comments}
+                                    likes={post.likes}
+                                    createdAt={post.createdAt}
+                                />
+                            ))
+                        ) : (
+                            <div className="bg-white rounded-xl p-8 text-center">
+                                <p className="text-gray-500">No hay posts disponibles</p>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
-            <CreatePostModal open={showCreateModal} onClose={() => setShowCreateModal(false)}/>
+            <CreatePostModal open={showCreateModal} onClose={() => setShowCreateModal(false)} />
         </div>
     );
 }
