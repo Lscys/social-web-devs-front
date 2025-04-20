@@ -7,6 +7,12 @@ export const ENDPOINTS = {
     },
     USER: '/users',
     PRODUCTS: '/products',
+    NOTIFICATIONS: {
+        GET_ONE: (id: number) => `/notifications/user/${id}`,
+        GET_UNREAD: (id: number) => `/notifications/user/${id}/unread`,
+        MARK_AS_READ: (id: number) => `/notifications/${id}/read`,
+        MARK_ALL_AS_READ: (id: number) => `/notifications/user/${id}/read-all`
+    },
     TECHNOLOGIES: {
         GET_ALL: '/technologies/all',
         GET_ONE: (id: number) => `/technologies/${id}`,

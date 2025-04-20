@@ -8,6 +8,9 @@ import { Post } from "../service/interface/Post";
 import PostCard from "./PostCard";
 import { PostService } from "../service/post/post.service";
 import CreatePostModal from './post/modal/CreatePostModal';
+import NotificationList from "./NotificationList";
+import { NotificationsService } from "@/service/notifications/notifications.service";
+import { Notification } from "@/service/interface/Notification";
 
 export default function PostFeed() {
     const navigate = useNavigate();
@@ -17,165 +20,17 @@ export default function PostFeed() {
     const [posts, setPosts] = useState<Post[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const [notifications, setNotifications] = useState<Notification[]>([]);
+    const [showNotifications, setShowNotifications] = useState(false);
+    const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false); // Estado para verificar si hay notificaciones no leídas
+    const [visibleCount, setVisibleCount] = useState(4);
+    const notificationsRef = useRef<HTMLDivElement | null>(null);
+    const notificationsIconRef = useRef<HTMLDivElement | null>(null);
+
+
+
 
     useEffect(() => {
-        // Simulamos una carga de datos
-        const dummyPosts: Post[] = [
-            {
-                id: 1,
-                title: "Iniciando el Proyecto de TODO LIST",
-                description: "Este proyecto tratará sobre mejorar la gestión de mi día a día sobre las cosas que hago.",
-                technologies: [
-                    {
-                        idtech: 1,
-                        name: "React",
-                        image: "https://reactjs.org/logo-og.png"
-                    },
-                    {
-                        idtech: 2,
-                        name: "TypeScript",
-                        image: "https://www.typescriptlang.org/assets/images/icons/apple-touch-icon-120x120.png"
-                    },
-                    {
-                        idtech: 3,
-                        name: "Node.js",
-                        image: "https://nodejs.org/static/images/logo.svg"
-                    }
-                ],
-                user: {
-                    iduser: 1,
-                    name: "hola",
-                    last_name: "hola2",
-                    email: "hola@gmail.com",
-                    phone: "222111333",
-                    image: "holaimage",
-                    usuario: "Holausuario"
-                },
-                postStats:
-                {
-                    id: 1,
-                    likesCount: 20,
-                    imageUrl: "urlimagen",
-                    starred: true
-                }
-                ,
-                comments: [
-                    {
-                        id: 1,
-                        content: "¡Qué buen proyecto! Me interesa seguir el avance.",
-                        createdAt: "1 hora atrás"
-                    },
-                    {
-                        id: 2,
-                        content: "Me gustaría aportar con ideas para el diseño.",
-                        createdAt: "30 minutos atrás"
-                    }
-                ],
-                likes: [
-                    {
-                        id: 1,
-                        post: {} as Post, // Se puede reemplazar luego con el post mismo para evitar referencia circular
-                        user: {
-                            iduser: 2,
-                            name: "Usuario2",
-                            last_name: "Apellido2",
-                            email: "usuario2@gmail.com",
-                            phone: "111222333",
-                            image: "image2",
-                            usuario: "usuario_2"
-                        },
-                        createdAt: "1 hora atrás"
-                    },
-                    {
-                        id: 3,
-                        post: {} as Post, // Se puede reemplazar luego con el post mismo para evitar referencia circular
-                        user: {
-                            iduser: 2,
-                            name: "Usuario2",
-                            last_name: "Apellido2",
-                            email: "usuario2@gmail.com",
-                            phone: "111222333",
-                            image: "image2",
-                            usuario: "usuario_2"
-                        },
-                        createdAt: "1 hora atrás"
-                    }
-                ],
-                createdAt: "2 horas atrás"
-            },
-            {
-                id: 2,
-                title: "Desarrollo de una Red Social Minimalista",
-                description: "Una red social enfocada en compartir momentos importantes sin distracciones.",
-                technologies: [
-                    {
-                        idtech: 1,
-                        name: "Vue.js",
-                        image: "https://vuejs.org/images/logo.png"
-                    },
-                    {
-                        idtech: 2,
-                        name: "Firebase",
-                        image: "https://firebase.google.com/static/images/brand-guidelines/logo-logomark.png"
-                    },
-                    {
-                        idtech: 3,
-                        name: "Tailwind CSS",
-                        image: "https://tailwindcss.com/favicons/apple-touch-icon.png"
-                    }
-                ],
-                user: {
-                    iduser: 3,
-                    name: "Carlos",
-                    last_name: "Gómez",
-                    email: "carlos@gmail.com",
-                    phone: "555444333",
-                    image: "carlos_image",
-                    usuario: "carlos_dev"
-                },
-                postStats:
-                {
-                    id: 2,
-                    likesCount: 45,
-                    imageUrl: "url_imagen_red_social",
-                    starred: true
-                }
-                ,
-                comments: [
-                    {
-                        id: 3,
-                        content: "Me encanta la idea de una red social minimalista. ¡Éxito!",
-                        createdAt: "3 horas atrás"
-                    },
-                    {
-                        id: 4,
-                        content: "¿Pensaste en integrar mensajes privados?",
-                        createdAt: "1 hora atrás"
-                    }
-                ],
-                likes: [
-                    {
-                        id: 1,
-                        post: {} as Post,
-                        user: {
-                            iduser: 4,
-                            name: "Ana",
-                            last_name: "López",
-                            email: "ana@gmail.com",
-                            phone: "777888999",
-                            image: "ana_image",
-                            usuario: "ana_design"
-                        },
-
-
-                        createdAt: "2 horas atrás"
-                    }
-                ],
-                createdAt: "5 horas atrás"
-            }
-
-        ];
-
         const fetchData = async () => {
             try {
                 // Obtenemos los posts reales
@@ -183,11 +38,11 @@ export default function PostFeed() {
 
                 console.log("oli caca", dataPosts)
 
+
                 // Usamos los posts reales o los dummy si no hay datos
                 setPosts(dataPosts);
             } catch (error) {
                 console.error("Error fetching posts:", error);
-                setPosts(dummyPosts);
             } finally {
                 setIsLoading(false);
             }
@@ -199,7 +54,59 @@ export default function PostFeed() {
         }, 1000); // Simulamos un delay de carga
     }, []);
 
-    console.log(posts)
+    // Manejo de clics fuera del área de notificaciones
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (
+                notificationsRef.current && !notificationsRef.current.contains(event.target as Node) &&
+                notificationsIconRef.current && !notificationsIconRef.current.contains(event.target as Node)
+            ) {
+                setShowNotifications(false); // Cierra las notificaciones si haces clic fuera
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
+    // Cargar las notificaciones
+    const loadNotifications = async () => {
+        try {
+            if (user?.iduser) {
+                const response = await NotificationsService.getNotifications(user.iduser);
+                setNotifications(response);
+
+                // Verificamos si hay notificaciones no leídas
+                const unreadNotifications = response.filter(notification => !notification.seen);
+                setHasUnreadNotifications(unreadNotifications.length > 0);
+            }
+        } catch (error) {
+            console.error("Error al cargar las notificaciones:", error);
+        }
+    };
+
+    /* // Marcar todas las notificaciones como leídas
+    const markAllAsRead = async () => {
+        if (user?.iduser) {
+            await NotificationsService.markAllAsRead(user.iduser);
+            loadNotifications(); // Recargamos las notificaciones para que se actualicen
+        }
+    }; */
+
+    // Cambiar el estado de mostrar/notificar notificaciones
+    const toggleNotifications = () => {
+        setShowNotifications(prevState => !prevState);
+    };
+
+    useEffect(() => {
+        if (user?.iduser) {
+            loadNotifications(); // Cargar las notificaciones cuando el usuario esté disponible
+        }
+    }, [user?.iduser]);
+
+
 
     // Cerrar menú al hacer clic fuera
     useEffect(() => {
@@ -228,6 +135,7 @@ export default function PostFeed() {
         navigate("/");
     }
 
+
     return (
         <div className="min-w-full min-h-full bg-gray-100 pt-4 pr-4 pl-4">
             {/* Topbar */}
@@ -238,7 +146,43 @@ export default function PostFeed() {
                         <FaFilter /> Filter
                     </button>
                     <FaCommentDots className="text-2xl" />
-                    <FaBell className="text-2xl" />
+
+                    {/* ... Otros iconos */}
+                    <div className="relative">
+                        <div ref={notificationsIconRef} className="relative inline-block">
+                            <FaBell
+                                className="text-2xl cursor-pointer"
+                                onClick={toggleNotifications}
+                            />
+                            {hasUnreadNotifications && (
+                                <div className="absolute top-0 right-0 bg-red-500 w-3 h-3 rounded-full"></div>
+                            )}
+
+                            {showNotifications && (
+                                <div
+                                    ref={notificationsRef}
+                                    className="absolute top-full right-0 mt-2 w-96 max-h-96 overflow-y-auto bg-white shadow-lg rounded-md p-4 z-50"
+                                >
+                                    <h3 className="text-lg font-semibold mb-2">Notificaciones</h3>
+
+                                    <NotificationList
+                                        notifications={notifications.slice(0, visibleCount)}
+                                        reloadNotifications={loadNotifications}
+                                    />
+
+                                    {visibleCount < notifications.length && (
+                                        <button
+                                            onClick={() => setVisibleCount(prev => prev + 4)}
+                                            className="mt-2 text-blue-500 text-sm underline"
+                                        >
+                                            Ver más notificaciones
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    {/* ... Resto del código */}
                     <div className="relative" ref={menuRef}>
                         {user?.image ? (
                             <img
@@ -288,7 +232,6 @@ export default function PostFeed() {
                             <MdOutlinePostAdd />
                             <span>Crear</span>
                         </div>
-                        {/* Agrega más ítems según la imagen */}
                     </nav>
                 </aside>
                 {/* Search & Create post */}
@@ -319,8 +262,8 @@ export default function PostFeed() {
                             </div>
                         ) : posts.length > 0 ? (
                             Array.isArray(posts) && posts.map((post) => (
-                                <PostCard key={post.idrelease} post={post}/>
-                              ))
+                                <PostCard key={post.idrelease} post={post} />
+                            ))
                         ) : (
                             <div className="bg-white rounded-xl p-8 text-center">
                                 <p className="text-gray-500">No hay posts disponibles</p>

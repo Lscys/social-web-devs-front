@@ -27,11 +27,6 @@ export const LikeButton: React.FC<LikeButtonProps> = ({ postId, currentUserId, p
 
     setLikes(postLike.likesCount || 0);
 
-    console.log("📤 Enviando like con:", {
-        postId,
-        currentUserId,
-    });
-
     const handler = (like: LikeResponse) => {
       if (like.postId === postId) {
         setLikes(like.totalLikes);
