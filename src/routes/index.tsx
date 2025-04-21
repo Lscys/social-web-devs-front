@@ -1,19 +1,16 @@
-import React, { lazy, Suspense } from 'react'
-import App from '../App'
-
-
+import { lazy, Suspense } from 'react'
+import { Route, Routes } from 'react-router-dom';
 const Home = lazy(() => import('../pages/Home'))
 const Dashboard = lazy(() => import('../pages/admin/Dashboard'))
 const Login = lazy(() => import("../pages/auth/Login"));
 const NotFound = lazy(() => import("../pages/notfound/NotFound"));
-import LoadingSpinner from "../components/loading/LoadingSpinner";
-import { Route, Routes } from 'react-router-dom';
+const LoadingSpinner = lazy(() => import("../components/loading/LoadingSpinner"));
 import PublicRoute from './PublicRoute';
 import PrivateRoute from './PrivateRoute';
-import Register from '../pages/auth/Register';
+const Register = lazy(() => import('../pages/auth/Register'));
 import { ForgotPassword } from '../pages/auth/ForgotPassword';
-import { Post } from '../pages/web/Post';
-import DetailsAccount from '../pages/user/DetailsAccount';
+const Social = lazy(() => import('../pages/web/Social'));
+const DetailsAccount = lazy(() => import('../pages/user/DetailsAccount'));
 
 
 const AppRoutes = () => {
@@ -27,7 +24,7 @@ const AppRoutes = () => {
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/forgotpassword" element={<ForgotPassword />} />
-                    <Route path="/social" element={<Post />} />
+                    <Route path="/social" element={<Social />} />
                 </Route>
 
                 {/* Rutas privadas */}

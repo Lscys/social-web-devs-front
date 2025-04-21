@@ -1,14 +1,14 @@
 import { FaUserCircle, FaThumbsUp, FaCommentDots, FaStar } from "react-icons/fa";
-import { Post } from "../service/interface/Post";
+import { Post } from "../../service/interface/Post";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale"
-import { LikeButton } from "./LikeButton";
+import { LikeButton } from "../LikeButton";
 import { useAuth } from "@/context/useAuth";
 import { useEffect, useState } from "react";
 import { CommentsService } from "@/service/comments/comments.service";
 import { CommentResponse } from "@/service/interface/Comments";
-import { PostDetailModal } from "./post/modal/PostDetailModal";
-import { Skeleton } from "./ui/skeleton";
+import { PostDetailModal } from "./modal/PostDetailModal";
+import { Skeleton } from "../ui/skeleton";
 
 type Props = {
     post: Post;
