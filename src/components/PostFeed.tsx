@@ -179,7 +179,7 @@ export default function PostFeed() {
 
                     {/* ... Otros iconos */}
                     <div className="relative">
-                        <div ref={notificationsIconRef} className="relative inline-block">
+                        <div ref={notificationsIconRef} className="">
                             <FaBell
                                 className="text-2xl cursor-pointer"
                                 onClick={toggleNotifications}

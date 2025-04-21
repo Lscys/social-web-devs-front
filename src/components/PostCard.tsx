@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { CommentsService } from "@/service/comments/comments.service";
 import { CommentResponse } from "@/service/interface/Comments";
 import { PostDetailModal } from "./post/modal/PostDetailModal";
+import { Skeleton } from "./ui/skeleton";
 
 type Props = {
     post: Post;
@@ -33,7 +34,7 @@ export default function PostCard({ post }: Props) {
     const [newComment, setNewComment] = useState("");
     const [showDetails, setShowDetails] = useState(false);
     const [allComments, setAllComments] = useState<CommentResponse[]>(comments);
-
+    const [isImageLoading, setIsImageLoading] = useState(true);
 
     const handleCommentSubmit = async () => {
         if (!newComment.trim() || !currentUser) return;
@@ -103,19 +104,31 @@ export default function PostCard({ post }: Props) {
                 <p className="text-gray-600 text-sm">{description}</p>
             </div>
 
-            {/* Imagen del post si existe */}
-            {imageUrl && (
-                <div
-                    className="rounded-lg overflow-hidden mb-4"
-                    onClick={() => setShowDetails(true)}
-                >
-                    <img
-                        src={imageUrl}
-                        alt={title}
-                        className="w-full h-96 object-cover transition-transform duration-300 hover:scale-105"
-                    />
-                </div>
-            )}
+
+            {/* Imagen del post si existe o placeholder */}
+            <div
+                className="rounded-lg overflow-hidden mb-4 cursor-pointer"
+                onClick={() => setShowDetails(true)}
+            >
+                {imageUrl ? (
+                    <>
+                        {isImageLoading && (
+                            <Skeleton className="w-full h-96 rounded-lg bg-gray-200 animate-pulse" />
+                        )}
+                        <img
+                            src={imageUrl}
+                            alt={title}
+                            className={`w-full h-96 object-cover transition-transform duration-300 hover:scale-105 ${isImageLoading ? "hidden" : "block"}`}
+                            onLoad={() => setIsImageLoading(false)}
+                            onError={() => setIsImageLoading(false)}
+                        />
+                    </>
+                ) : (
+                    <div className="w-full h-96 bg-gray-100 flex items-center justify-center text-gray-400 text-sm rounded-lg border border-dashed">
+                        No hay imagen disponible
+                    </div>
+                )}
+            </div>
 
             {/* Tecnologías */}
             {technologies.length > 0 && (
