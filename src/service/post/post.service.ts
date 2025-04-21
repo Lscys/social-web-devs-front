@@ -1,10 +1,11 @@
+import { PaginatedResponse } from "@/components/PostFeed";
 import { apiClient } from "../api/apiClient";
 import { ENDPOINTS } from "../api/endpoints";
 import { Post, PostRequest } from "../interface/Post";
 
 export const PostService = {
-    getAllPosts: async () => {
-        return apiClient.get<Post[]>(ENDPOINTS.POST.GET_ALL_POSTS);
+    getAllPosts: async (page: number, size: number = 10) => {
+        return apiClient.get<PaginatedResponse<Post>>(`${ENDPOINTS.POST.GET_ALL_POSTS}?page=${page}&size=${size}`);
     },
 
     registerPost: async (request: PostRequest) => {

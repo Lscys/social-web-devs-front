@@ -11,6 +11,19 @@ import CreatePostModal from './post/modal/CreatePostModal';
 import NotificationList from "./NotificationList";
 import { NotificationsService } from "@/service/notifications/notifications.service";
 import { Notification } from "@/service/interface/Notification";
+import { useInView } from "react-intersection-observer";
+import { toast } from "sonner";
+
+export type PaginatedResponse<T> = {
+    content: T[];
+    totalPages: number;
+    totalElements: number;
+    number: number;
+    size: number;
+    first: boolean;
+    last: boolean;
+    empty: boolean;
+};
 
 export default function PostFeed() {
     const navigate = useNavigate();
@@ -18,41 +31,55 @@ export default function PostFeed() {
     const [showMenu, setShowMenu] = useState(false);
     const menuRef = useRef<HTMLDivElement | null>(null);
     const [posts, setPosts] = useState<Post[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [showNotifications, setShowNotifications] = useState(false);
     const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false); // Estado para verificar si hay notificaciones no leídas
     const [visibleCount, setVisibleCount] = useState(4);
+    const [page, setPage] = useState(0);
+    const [isLoading, setIsLoading] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
     const notificationsRef = useRef<HTMLDivElement | null>(null);
     const notificationsIconRef = useRef<HTMLDivElement | null>(null);
+    const { ref, inView } = useInView({
+        threshold: 0.5, // Solo se activa cuando al menos 50% del elemento está visible
+    });
+    const isFetchingRef = useRef(false);
 
 
+    const fetchPosts = async (pageNumber: number, isInitial = false) => {
+        if (isFetchingRef.current || !hasMore) return;
 
+        isFetchingRef.current = true;
+        if (isInitial) setIsLoading(true);
 
+        try {
+            const data = await PostService.getAllPosts(pageNumber, 10);
+            setPosts(prev => [...prev, ...data.content]);
+            setHasMore(!data.last);
+        } catch (error) {
+            toast.error('Error al cargar los posts', {
+                description: 'Error al cargar los posts, por favor intenta más tarde',
+                duration: 4000,
+            });
+        } finally {
+            isFetchingRef.current = false;
+            if (isInitial) setIsLoading(false);
+        }
+    };
+
+    // Primer fetch
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                // Obtenemos los posts reales
-                const dataPosts: Post[] = await PostService.getAllPosts();
-
-                console.log("oli caca", dataPosts)
-
-
-                // Usamos los posts reales o los dummy si no hay datos
-                setPosts(dataPosts);
-            } catch (error) {
-                console.error("Error fetching posts:", error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        setTimeout(() => {
-            setIsLoading(false);
-            fetchData(); // Llamamos a la función para obtener los datos reales
-        }, 1000); // Simulamos un delay de carga
+        fetchPosts(0, true);
     }, []);
+
+    // Scroll infinito
+    useEffect(() => {
+        if (inView && hasMore && !isFetchingRef.current) {
+            fetchPosts(page + 1);
+            setPage(prev => prev + 1);
+        }
+    }, [inView]);
 
     // Manejo de clics fuera del área de notificaciones
     useEffect(() => {
@@ -83,7 +110,10 @@ export default function PostFeed() {
                 setHasUnreadNotifications(unreadNotifications.length > 0);
             }
         } catch (error) {
-            console.error("Error al cargar las notificaciones:", error);
+            toast.error('Error al cargar las notificaciones', {
+                description: 'Error al cargar las notificaciones, por favor intenta más tarde',
+                duration: 4000,
+            });
         }
     };
 
@@ -256,7 +286,7 @@ export default function PostFeed() {
                     {/* <div className="flex-1 max-w-6xl mx-auto px-6 h-full overflow-y-auto mt-6"> */}
                     {/* Listado de Posts */}
                     <div className="space-y-4 flex-1 max-w-6xl mx-auto h-full overflow-y-auto mt-6">
-                        {isLoading ? (
+                        {isLoading && posts.length === 0 ? (
                             <div className="flex justify-center items-center h-64">
                                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
                             </div>
@@ -267,6 +297,15 @@ export default function PostFeed() {
                         ) : (
                             <div className="bg-white rounded-xl p-8 text-center">
                                 <p className="text-gray-500">No hay posts disponibles</p>
+                            </div>
+                        )}
+                        {hasMore && (
+                            <div ref={ref} className="h-12 flex justify-center items-center">
+                                {isLoading ? (
+                                    <span className="text-gray-500">Cargando...</span>
+                                ) : (
+                                    <span className="text-gray-400">Desliza para cargar más</span>
+                                )}
                             </div>
                         )}
                     </div>
