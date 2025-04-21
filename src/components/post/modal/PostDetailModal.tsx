@@ -1,44 +1,35 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/context/useAuth';
-import { CommentsService } from '@/service/comments/comments.service';
-import { CommentResponse } from '@/service/interface/Comments';
+import { useAddComment, useComments } from '@/hooks/useComments';
 import { Post } from '@/service/interface/Post';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { FC, use, useEffect, useState } from 'react'
+import { FC, useState } from 'react'
 
 interface Props {
     isOpen: boolean;
     onClose: (open: boolean) => void;
     post: Post;
-    comments: CommentResponse[];
 }
 
-export const PostDetailModal: FC<Props> = ({ isOpen, onClose, post, comments }) => {
-    const [newComment, setNewComment] = useState('');
-    const [commentList, setCommentList] = useState<CommentResponse[]>(comments);
+export const PostDetailModal: FC<Props> = ({ isOpen, onClose, post }) => {
     const { user: currentUser } = useAuth();
-
+    const [newComment, setNewComment] = useState('');
     const [isImageLoading, setIsImageLoading] = useState(true);
-    const [isAvatarLoading, setIsAvatarLoading] = useState(true);
-
-    useEffect(() => {
-        setCommentList(comments);
-    }, [comments]);
+    const { data: commentList = [], isLoading } = useComments(post.idrelease);
+    const addComment = useAddComment(post.idrelease);
 
     const handleCommentSubmit = async () => {
         if (!newComment.trim() || !currentUser) return;
 
         try {
-            await CommentsService.createComment({
+            await addComment.mutateAsync({
                 postId: post.idrelease,
                 userId: currentUser.iduser,
                 content: newComment,
             });
 
-            const updatedComments = await CommentsService.getAllCommentForPostById(post.idrelease);
-            setCommentList(updatedComments);
             setNewComment('');
         } catch (error) {
             console.error('Error al enviar comentario desde modal', error);
@@ -88,7 +79,7 @@ export const PostDetailModal: FC<Props> = ({ isOpen, onClose, post, comments }) 
                         <div>
                             <h3 className="font-semibold text-gray-700 mb-1">Comentarios:</h3>
                             <div className="space-y-3 max-h-64 overflow-y-auto">
-                                {comments.length > 0 ? comments.map((comment) => (
+                                {commentList.length > 0 ? commentList.map((comment) => (
                                     <div key={comment.id} className="bg-gray-100 p-2 rounded-lg shadow-sm">
                                         <div className="flex justify-between text-xs text-gray-600 mb-1">
                                             <span>{comment.user?.name} {comment.user?.last_name}</span>

@@ -9,6 +9,7 @@ import { CommentsService } from "@/service/comments/comments.service";
 import { CommentResponse } from "@/service/interface/Comments";
 import { PostDetailModal } from "./modal/PostDetailModal";
 import { Skeleton } from "../ui/skeleton";
+import { useAddComment, useComments } from "@/hooks/useComments";
 
 type Props = {
     post: Post;
@@ -33,28 +34,28 @@ export default function PostCard({ post }: Props) {
     const imageUrl = postStats?.imageUrl?.trim() || "";
     const [newComment, setNewComment] = useState("");
     const [showDetails, setShowDetails] = useState(false);
-    const [allComments, setAllComments] = useState<CommentResponse[]>(comments);
     const [isImageLoading, setIsImageLoading] = useState(true);
+
+    const { data: allComments = [], isLoading: isLoadingComments } = useComments(idrelease);
+    const addComment = useAddComment(idrelease);
 
     const handleCommentSubmit = async () => {
         if (!newComment.trim() || !currentUser) return;
 
         try {
-
-            await CommentsService.createComment({
+            await addComment.mutateAsync({
                 postId: idrelease,
                 userId: currentUser.iduser,
                 content: newComment,
             });
 
-            loadComments();
             setNewComment("");
         } catch (error) {
             console.error("Error al enviar comentario", error);
         }
     };
 
-    const loadComments = async () => {
+    /* const loadComments = async () => {
         try {
             if (user?.iduser) {
                 const response = await CommentsService.getAllCommentForPostById(idrelease);
@@ -65,11 +66,11 @@ export default function PostCard({ post }: Props) {
         } catch (error) {
             console.error("Error al cargar las notificaciones:", error);
         }
-    };
+    }; */
 
-    useEffect(() => {
+    /* useEffect(() => {
         setAllComments(comments as CommentResponse[]);
-    }, [comments]);
+    }, [comments]); */
 
 
 
@@ -156,7 +157,11 @@ export default function PostCard({ post }: Props) {
                     onClick={() => setShowDetails(true)}
                 >
                     <FaCommentDots className="text-sm" />
-                    <span className="text-sm">{comments?.length ? comments.length : 0}</span>
+                    {isLoadingComments ? (
+                        <p className="text-sm text-gray-400">Cargando comentarios...</p>
+                    ) : (
+                        <span className="text-sm">{allComments.length}</span>
+                    )}
                 </button>
 
                 <button
@@ -183,13 +188,13 @@ export default function PostCard({ post }: Props) {
                     >
                         Enviar
                     </button>
+                    
                 </div>
             </div>
             <PostDetailModal
                 isOpen={showDetails}
                 onClose={setShowDetails}
                 post={post}
-                comments={allComments}
             />
         </div>
     );

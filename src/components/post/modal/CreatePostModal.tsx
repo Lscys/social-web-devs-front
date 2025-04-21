@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/context/useAuth';
+import { useCreatePost } from '@/hooks/useCreatePost';
 import { PostRequest, Technologies } from '@/service/interface/Post';
 import { PostService } from '@/service/post/post.service';
 import { TechnologiesService } from '@/service/technologies/technologies.service';
@@ -25,7 +26,15 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ open, onClose }) => {
     const [technologies, setTechnologies] = useState<Technologies[]>();
     const [image, setImage] = useState<string | null>(null);
     const [selectedTechnologies, setSelectedTechnologies] = useState<number[]>([]);
-    const [loading, setLoading] = useState(false);
+
+    // 🚀 Mutation de publicación
+    const createPostMutation = useCreatePost(() => {
+        toast.success("Se publicó tu post", {
+            description: "Post publicado con éxito",
+            duration: 4000,
+        });
+        onClose(); // Cierra el modal
+    });
 
     // Función para manejar la carga de la imagen
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,49 +60,27 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ open, onClose }) => {
         fetchTechnologies();
     }, [])
 
-    const onPushPost = async (e: React.FormEvent) => {
+    const onPushPost = (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
 
+        if (!title || !description || !selectedTechnologies.length || !user?.iduser) {
+            toast.error("Datos incompletos", {
+                description: "Por favor completa todos los campos",
+                duration: 4000,
+            });
+            return;
+        }
 
         const data: PostRequest = {
             title,
             description,
-            technologiesIds: selectedTechnologies, // fallback en caso de undefined
-            userId: user?.iduser ?? 0, // fallback si user no está disponible
-            imageUrl: image ?? ""
+            technologiesIds: selectedTechnologies,
+            userId: user.iduser,
+            imageUrl: image ?? "",
         };
 
-        console.log(data)
-
-        try {
-            if (!title || !description || !technologies?.length || !user?.iduser) {
-                toast.error('Datos incompletos', {
-                    description: 'Por favor completa todos los campos',
-                    duration: 4000,
-                });
-                setLoading(false);
-                return;
-            }
-
-            await PostService.registerPost(data);
-
-            toast.success('Se publico tu post', {
-                description: 'Post publicado con éxito',
-                duration: 4000,
-            });
-
-            onClose(); // Cerrar el modal después de publicar
-        } catch (err) {
-            console.error(err);
-            toast.error('Credenciales inválidas', {
-                description: 'Correo u contraseña incorrectos',
-                duration: 4000,
-            });
-        } finally {
-            setLoading(false);
-        }
-    }
+        createPostMutation.mutate(data);
+    };
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
@@ -193,8 +180,9 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ open, onClose }) => {
                 <div className="flex justify-end mt-4">
                     <Button
                         onClick={onPushPost}
+                        disabled={createPostMutation.isPending}
                     >
-                        Publicar
+                        {createPostMutation.isPending ? "Publicando..." : "Publicar"}
                     </Button>
                 </div>
             </DialogContent>

@@ -1,7 +1,6 @@
-import { PaginatedResponse } from "@/components/PostFeed";
 import { apiClient } from "../api/apiClient";
 import { ENDPOINTS } from "../api/endpoints";
-import { Post, PostRequest } from "../interface/Post";
+import { PaginatedResponse, Post, PostRequest } from "../interface/Post";
 
 export const PostService = {
     getAllPosts: async (page: number, size: number = 10) => {

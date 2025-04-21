@@ -24,6 +24,7 @@ const NotificationList = ({
         }
     };
 
+
     return (
         <ul className="space-y-2">
             {notifications.map((notif) => (
