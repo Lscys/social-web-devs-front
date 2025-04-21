@@ -13,6 +13,12 @@ export const ENDPOINTS = {
         MARK_AS_READ: (id: number) => `/notifications/${id}/read`,
         MARK_ALL_AS_READ: (id: number) => `/notifications/user/${id}/read-all`
     },
+    COMMENTS: {
+        GET_ALL_BY_ID_POST: (id: number) => `/comments/post/${id}`,
+        CREATE: '/comments/create',
+        UPDATE: (id: number) => `/comments/${id}`,
+        DELETE: (id: number) => `/comments/${id}`
+    },
     TECHNOLOGIES: {
         GET_ALL: '/technologies/all',
         GET_ONE: (id: number) => `/technologies/${id}`,

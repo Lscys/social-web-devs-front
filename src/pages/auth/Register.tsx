@@ -2,6 +2,7 @@ import { useState } from "react";
 import { RegisterCredential } from "../../service/interface/Credential";
 import { AuthService } from "../../service/auth/auth.service";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 export default function Register() {
     const navigate = useNavigate();
@@ -34,12 +35,13 @@ export default function Register() {
         const registerCredential: RegisterCredential = { email, password, name: nameFull, last_name: lastnameFull };
 
         try {
-            const response = await AuthService.register(registerCredential);
+            await AuthService.register(registerCredential);
 
-            alert('Registro exitoso! Redirigiendo al login...');
+            toast.success('Registro exitoso', {
+                description: 'Redirigiendo al login...',
+                duration: 4000,
+            });
 
-            console.log("Registrando:", registerCredential);
-            // Redirigir al usuario después del login exitoso
             navigate('/login');
         } catch (err: any) {
             console.error("Error en registro:", err);

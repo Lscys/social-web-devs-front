@@ -1,3 +1,4 @@
+import { CommentResponse } from "./Comments";
 import { User } from "./User";
 
 export interface Post {
@@ -7,7 +8,7 @@ export interface Post {
     technologies: Technologies[];
     user: User;
     postStats: PostStats;
-    comments: Comments[];
+    comments: CommentResponse[];
     likes: Likes[];    
     createdAt: string;
 }
@@ -23,12 +24,6 @@ export interface PostStats {
     likesCount: number;
     imageUrl: string;
     starred: boolean;
-}
-
-export interface Comments {
-    id: number;
-    content: string;
-    createdAt: string;
 }
 
 export interface Likes {

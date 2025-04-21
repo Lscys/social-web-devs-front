@@ -4,6 +4,10 @@ import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale"
 import { LikeButton } from "./LikeButton";
 import { useAuth } from "@/context/useAuth";
+import { useEffect, useState } from "react";
+import { CommentsService } from "@/service/comments/comments.service";
+import { CommentResponse } from "@/service/interface/Comments";
+import { PostDetailModal } from "./post/modal/PostDetailModal";
 
 type Props = {
     post: Post;
@@ -26,6 +30,47 @@ export default function PostCard({ post }: Props) {
 
     const { user: currentUser } = useAuth();
     const imageUrl = postStats?.imageUrl?.trim() || "";
+    const [newComment, setNewComment] = useState("");
+    const [showDetails, setShowDetails] = useState(false);
+    const [allComments, setAllComments] = useState<CommentResponse[]>(comments);
+
+
+    const handleCommentSubmit = async () => {
+        if (!newComment.trim() || !currentUser) return;
+
+        try {
+
+            await CommentsService.createComment({
+                postId: idrelease,
+                userId: currentUser.iduser,
+                content: newComment,
+            });
+
+            loadComments();
+            setNewComment("");
+        } catch (error) {
+            console.error("Error al enviar comentario", error);
+        }
+    };
+
+    const loadComments = async () => {
+        try {
+            if (user?.iduser) {
+                const response = await CommentsService.getAllCommentForPostById(idrelease);
+                console.log("Comentarios cargados:", response);
+                setAllComments(response);
+                setNewComment("");
+            }
+        } catch (error) {
+            console.error("Error al cargar las notificaciones:", error);
+        }
+    };
+
+    useEffect(() => {
+        setAllComments(comments as CommentResponse[]);
+    }, [comments]);
+
+
 
     return (
         <div className="bg-white rounded-xl p-6 shadow-md mb-6 mr-4">
@@ -60,7 +105,10 @@ export default function PostCard({ post }: Props) {
 
             {/* Imagen del post si existe */}
             {imageUrl && (
-                <div className="rounded-lg overflow-hidden mb-4">
+                <div
+                    className="rounded-lg overflow-hidden mb-4"
+                    onClick={() => setShowDetails(true)}
+                >
                     <img
                         src={imageUrl}
                         alt={title}
@@ -88,32 +136,48 @@ export default function PostCard({ post }: Props) {
 
             {/* Acciones */}
             <div className="flex items-center gap-5 border-t pt-4 mt-4">
-                {/* <button className="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition">
-                    <FaThumbsUp className="text-sm" />
-                    <span className="text-sm">{likes.length}</span>
-                </button> */}
                 <LikeButton postId={idrelease} postLike={postStats} currentUserId={currentUser?.iduser!}></LikeButton>
 
-                <button className="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition">
+                <button
+                    className="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition"
+                    onClick={() => setShowDetails(true)}
+                >
                     <FaCommentDots className="text-sm" />
-                    <span className="text-sm">{comments.length}</span>
+                    <span className="text-sm">{comments?.length ? comments.length : 0}</span>
                 </button>
 
                 <button
                     className={`flex items-center gap-2 transition ${postStats.starred
-                            ? "text-yellow-400"
-                            : "text-gray-500 hover:text-yellow-400"
+                        ? "text-yellow-400"
+                        : "text-gray-500 hover:text-yellow-400"
                         }`}
                 >
                     <FaStar className="text-sm" />
                 </button>
 
-                <input
-                    type="text"
-                    placeholder="Comentar algo..."
-                    className="flex-1 border border-gray-300 rounded-full px-4 py-1.5 text-sm ml-4 focus:outline-none focus:ring-2 focus:ring-blue-300"
-                />
+                {/* Nuevo comentario */}
+                <div className="relative w-full mt-2">
+                    <input
+                        type="text"
+                        placeholder="Comentar algo..."
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                        className="w-full border border-gray-300 rounded-full px-4 pr-20 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+                    />
+                    <button
+                        onClick={handleCommentSubmit}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-blue-600 font-medium hover:underline"
+                    >
+                        Enviar
+                    </button>
+                </div>
             </div>
+            <PostDetailModal
+                isOpen={showDetails}
+                onClose={setShowDetails}
+                post={post}
+                comments={allComments}
+            />
         </div>
     );
 }
