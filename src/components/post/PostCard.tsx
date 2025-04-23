@@ -1,6 +1,6 @@
 import { FaUserCircle, FaThumbsUp, FaCommentDots, FaStar } from "react-icons/fa";
 import { Post } from "../../service/interface/Post";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow, set } from "date-fns";
 import { es } from "date-fns/locale"
 import { LikeButton } from "../LikeButton";
 import { useAuth } from "@/context/useAuth";
@@ -8,6 +8,11 @@ import { useState } from "react";
 import { PostDetailModal } from "./modal/PostDetailModal";
 import { Skeleton } from "../ui/skeleton";
 import { useAddComment, useComments } from "@/hooks/useComments";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { PostService } from "@/service/post/post.service";
+import { toast } from "sonner";
+import EditPostModal from "./modal/EditPostModal";
 
 type Props = {
     post: Post;
@@ -33,6 +38,9 @@ export default function PostCard({ post }: Props) {
     const [newComment, setNewComment] = useState("");
     const [showDetails, setShowDetails] = useState(false);
     const [isImageLoading, setIsImageLoading] = useState(true);
+    const [editingPost, setEditingPost] = useState<Post | null>(null);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
 
     const { data: allComments = [], isLoading: isLoadingComments } = useComments(idrelease);
     const addComment = useAddComment(idrelease);
@@ -53,12 +61,33 @@ export default function PostCard({ post }: Props) {
         }
     };
 
+    const handleCloseEditModal = () => {
+        setIsEditModalOpen(false);
+        setEditingPost(null);
+    };
+
+    const onEdit = (post: Post) => {
+        setEditingPost(post);
+        setIsEditModalOpen(true);
+    };
+
+    const onDelete = async (id: number) => {
+        if (confirm("¿Estás seguro de que quieres eliminar este post?")) {
+            try {
+                await PostService.deletePost(id, currentUser?.iduser!);
+                // Recargar lista de posts o actualizar UI local
+                toast.success("Post eliminado");
+            } catch (error) {
+                toast.error("Error al eliminar el post");
+            }
+        }
+    };
 
 
     return (
         <div className="bg-white rounded-xl p-6 shadow-md mb-6 mr-4">
             {/* Header usuario */}
-            <div className="flex items-center gap-4 mb-4">
+            <div className="flex items-center gap-4 mb-4 justify-between">
                 {user.image ? (
                     <img
                         src={user.image}
@@ -68,15 +97,38 @@ export default function PostCard({ post }: Props) {
                 ) : (
                     <FaUserCircle className="w-12 h-12 text-gray-400" />
                 )}
-                <div className="flex-1">
-                    <div className="flex justify-between items-center">
-                        <p className="font-semibold text-gray-800">
-                            {user.name} {user.last_name}
-                        </p>
-                        <span className="text-xs text-gray-400">
-                            {formatDistanceToNow(new Date(createdAt), { addSuffix: true, locale: es })}
-                        </span>
-                    </div>
+                {/* ... dentro del header del post */}
+                <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-400">
+                        {formatDistanceToNow(new Date(createdAt), { addSuffix: true, locale: es })}
+                    </span>
+
+                    {currentUser?.iduser === post.user.iduser && (
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button className="p-1 rounded-full hover:bg-gray-100">
+                                    <MoreHorizontal className="w-5 h-5 text-gray-500" />
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                {/* Se agrego esto ya que elimina un style pointer-events que se agrega automaticamente */}
+                                <DropdownMenuItem
+                                    onClick={() => {
+                                        requestAnimationFrame(() => {
+                                            onEdit(post);
+                                        });
+                                    }}
+                                >
+                                    <Pencil className="w-4 h-4 mr-2" />
+                                    Editar
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => onDelete(post.idrelease)}>
+                                    <Trash2 className="w-4 h-4 mr-2 text-red-500" />
+                                    Eliminar
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    )}
                 </div>
             </div>
 
@@ -169,13 +221,18 @@ export default function PostCard({ post }: Props) {
                     >
                         Enviar
                     </button>
-                    
+
                 </div>
             </div>
             <PostDetailModal
                 isOpen={showDetails}
                 onClose={setShowDetails}
                 post={post}
+            />
+            <EditPostModal
+                isOpen={isEditModalOpen}
+                onClose={handleCloseEditModal}
+                post={editingPost}
             />
         </div>
     );

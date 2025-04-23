@@ -9,6 +9,14 @@ export const PostService = {
 
     registerPost: async (request: PostRequest) => {
         return apiClient.post<Post>(ENDPOINTS.POST.CREATE_POST, request);
+    },
+
+    updatePost: async (id: number, request: PostRequest) => {
+        return apiClient.put<Post>(ENDPOINTS.POST.UPDATE_POST(id), request);
+    },
+    
+    deletePost: async (id: number, userId: number) => {
+        return apiClient.delete<void>(`${ENDPOINTS.POST.DELETE_POST(id)}?userId=${userId}`);
     }
 
 };

@@ -28,10 +28,9 @@ export const ENDPOINTS = {
     },
     POST: {
         GET_ALL_POSTS: '/post/all',
-        GET_POST: (id: number) => `/posts/${id}`,
         CREATE_POST: '/post/create',
-        UPDATE_POST: (id: number) => `/posts/${id}`,
-        DELETE_POST: (id: number) => `/posts/${id}`
+        UPDATE_POST: (id: number) => `/post/update/${id}`,
+        DELETE_POST: (id: number) => `/post/delete/${id}`
     }
     // ... otros endpoints
 };
