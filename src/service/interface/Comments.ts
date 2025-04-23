@@ -15,3 +15,14 @@ export interface CommentResponse {
         image?: string;
     };
 }
+
+export interface UpdateComment {
+    userId: number;
+    content: string;
+    commentId: number;
+}
+
+export interface DeleteComment {
+    commentId: number;
+    userId: number;
+}

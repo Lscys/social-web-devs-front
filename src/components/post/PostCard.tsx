@@ -4,9 +4,7 @@ import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale"
 import { LikeButton } from "../LikeButton";
 import { useAuth } from "@/context/useAuth";
-import { useEffect, useState } from "react";
-import { CommentsService } from "@/service/comments/comments.service";
-import { CommentResponse } from "@/service/interface/Comments";
+import { useState } from "react";
 import { PostDetailModal } from "./modal/PostDetailModal";
 import { Skeleton } from "../ui/skeleton";
 import { useAddComment, useComments } from "@/hooks/useComments";
@@ -54,23 +52,6 @@ export default function PostCard({ post }: Props) {
             console.error("Error al enviar comentario", error);
         }
     };
-
-    /* const loadComments = async () => {
-        try {
-            if (user?.iduser) {
-                const response = await CommentsService.getAllCommentForPostById(idrelease);
-                console.log("Comentarios cargados:", response);
-                setAllComments(response);
-                setNewComment("");
-            }
-        } catch (error) {
-            console.error("Error al cargar las notificaciones:", error);
-        }
-    }; */
-
-    /* useEffect(() => {
-        setAllComments(comments as CommentResponse[]);
-    }, [comments]); */
 
 
 

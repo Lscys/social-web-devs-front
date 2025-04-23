@@ -1,6 +1,6 @@
 import { apiClient } from "../api/apiClient";
 import { ENDPOINTS } from "../api/endpoints";
-import { CommentRequest, CommentResponse } from "../interface/Comments";
+import { CommentRequest, CommentResponse, UpdateComment } from "../interface/Comments";
 
 
 export const CommentsService = {
@@ -13,7 +13,13 @@ export const CommentsService = {
         return await apiClient.post<CommentRequest>(ENDPOINTS.COMMENTS.CREATE, data);
     },
 
+    updateComment: async (data: UpdateComment) => {
+        return await apiClient.put<CommentRequest>(ENDPOINTS.COMMENTS.UPDATE, data);
+    },
 
-    
+    deleteComment: async (commentId: number, userId: number) => {
+        return await apiClient.delete(ENDPOINTS.COMMENTS.DELETE(commentId, userId));
+    }
+
 
 };

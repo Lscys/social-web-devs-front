@@ -16,8 +16,8 @@ export const ENDPOINTS = {
     COMMENTS: {
         GET_ALL_BY_ID_POST: (id: number) => `/comments/post/${id}`,
         CREATE: '/comments/create',
-        UPDATE: (id: number) => `/comments/${id}`,
-        DELETE: (id: number) => `/comments/${id}`
+        UPDATE: `/comments/update`,
+        DELETE: (commentId: number, userId: number) => `/comments/delete/${commentId}?userId=${userId}`,
     },
     TECHNOLOGIES: {
         GET_ALL: '/technologies/all',

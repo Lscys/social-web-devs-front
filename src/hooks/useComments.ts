@@ -19,3 +19,26 @@ export const useAddComment = (postId: number) => {
     },
   });
 };
+
+export const useUpdateComment = (postId: number) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: CommentsService.updateComment,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['comments', postId] });
+    },
+  });
+};
+
+export const useDeleteComment = (postId: number) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ commentId, userId }: { commentId: number; userId: number }) =>
+      CommentsService.deleteComment(commentId, userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['comments', postId] });
+    },
+  });
+};
