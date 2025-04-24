@@ -1,6 +1,6 @@
-import { FaUserCircle, FaThumbsUp, FaCommentDots, FaStar } from "react-icons/fa";
+import { FaUserCircle, FaCommentDots, FaStar } from "react-icons/fa";
 import { Post } from "../../service/interface/Post";
-import { formatDistanceToNow, set } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale"
 import { LikeButton } from "../LikeButton";
 import { useAuth } from "@/context/useAuth";
@@ -18,9 +18,7 @@ type Props = {
     post: Post;
 };
 
-
 export default function PostCard({ post }: Props) {
-
     const {
         idrelease,
         title,
@@ -41,7 +39,6 @@ export default function PostCard({ post }: Props) {
     const [editingPost, setEditingPost] = useState<Post | null>(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-
     const { data: allComments = [], isLoading: isLoadingComments } = useComments(idrelease);
     const addComment = useAddComment(idrelease);
 
@@ -54,7 +51,6 @@ export default function PostCard({ post }: Props) {
                 userId: currentUser.iduser,
                 content: newComment,
             });
-
             setNewComment("");
         } catch (error) {
             console.error("Error al enviar comentario", error);
@@ -75,14 +71,12 @@ export default function PostCard({ post }: Props) {
         if (confirm("¿Estás seguro de que quieres eliminar este post?")) {
             try {
                 await PostService.deletePost(id, currentUser?.iduser!);
-                // Recargar lista de posts o actualizar UI local
                 toast.success("Post eliminado");
             } catch (error) {
                 toast.error("Error al eliminar el post");
             }
         }
     };
-
 
     return (
         <div className="bg-white rounded-xl p-6 shadow-md mb-6 mr-4">

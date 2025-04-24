@@ -1,12 +1,18 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useInView } from "react-intersection-observer";
-import { Post } from "@/service/interface/Post";
 import PostCard from "./PostCard";
-import { PostService } from "@/service/post/post.service";
-import { toast } from "sonner";
 import { usePosts } from "@/hooks/usePosts";
+import { useQueryClient } from "@tanstack/react-query";
+import PostSkeleton from "../skeleton/PostSkeleton";
 
-export default function PostList() {
+
+type PostListProps = {
+    setRefetchFn?: (refetchFn: () => void, scrollToTop: () => void) => void;
+};
+
+export default function PostList({ setRefetchFn }: PostListProps) {
+    const queryClient = useQueryClient();
+    const containerRef = useRef<HTMLDivElement | null>(null);
     const { ref, inView } = useInView({ threshold: 0.5 });
     const {
         data,
@@ -15,6 +21,7 @@ export default function PostList() {
         isFetchingNextPage,
         isLoading,
         isError,
+        refetch,
     } = usePosts();
 
     // Scroll infinito
@@ -22,12 +29,34 @@ export default function PostList() {
         if (inView && hasNextPage) fetchNextPage();
     }, [inView]);
 
+    useEffect(() => {
+        if (setRefetchFn) {
+            setRefetchFn(
+                () => {
+                    // Hacemos scroll primero
+                    containerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+
+                    // Se espera un poco para que se vea el scroll, y luego limpiamos y refetcheamos
+                    setTimeout(() => {
+                        queryClient.removeQueries({ queryKey: ['posts'] });
+                        refetch();
+                    }, 800);
+                },
+                () => {
+                    containerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+                }
+            );
+        }
+    }, [refetch]);
+
     const posts = data?.pages.flatMap((page) => page.content) ?? [];
 
     if (isLoading) {
         return (
-            <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500" />
+            <div className="space-y-4">
+                {Array.from({ length: 3 }).map((_, index) => (
+                    <PostSkeleton key={index} />
+                ))}
             </div>
         );
     }
@@ -37,7 +66,10 @@ export default function PostList() {
     }
 
     return (
-        <div className="space-y-4 flex-1 max-w-6xl mx-auto h-full overflow-y-auto mt-6">
+        <div
+            ref={containerRef}
+            className="space-y-4 flex-1 max-w-6xl mx-auto h-full overflow-y-auto mt-6"
+        >
             {posts.length > 0 ? (
                 posts.map((post) => <PostCard key={post.idrelease} post={post} />)
             ) : (

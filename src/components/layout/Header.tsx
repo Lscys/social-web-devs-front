@@ -1,4 +1,4 @@
-import { FaBell, FaUser } from "react-icons/fa";
+import { FaBell, FaHome, FaUser, FaUserPlus } from "react-icons/fa";
 import { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/useAuth";
@@ -10,9 +10,11 @@ type HeaderProps = {
     notifications: Notification[];
     hasUnread: boolean;
     reloadNotifications: () => void;
+    reloadPosts: () => void;
+    scrollToTop: () => void;
 };
 
-export default function Header({ notifications, hasUnread, reloadNotifications }: HeaderProps) {
+export default function Header({ notifications, hasUnread, reloadNotifications, reloadPosts, scrollToTop }: HeaderProps) {
     const { user, setIsAuthenticated, isAuthenticated } = useAuth();
     const navigate = useNavigate();
     const [showNotifications, setShowNotifications] = useState(false);
@@ -57,9 +59,21 @@ export default function Header({ notifications, hasUnread, reloadNotifications }
         <header className="flex justify-between items-center bg-white p-4 shadow rounded-md">
             <div className="text-2xl font-bold">DEVS</div>
             <div className="flex gap-6 items-center">
+                <FaHome
+                    className="text-4xl cursor-pointer rounded-md hover:bg-gray-100 hover:scale-140 transition-transform duration-200 ease-in-out p-1"
+                    onClick={() => {
+                        scrollToTop();
+                        reloadPosts();
+                    }}
+                />
+                <FaUserPlus
+                    className="text-4xl cursor-pointer rounded-md hover:bg-gray-100 hover:scale-140 transition-transform duration-200 ease-in-out p-1"
+                />
+            </div>
+            <div className="flex gap-6 items-center">
                 <div className="relative" ref={notificationsIconRef}>
                     <FaBell
-                        className="text-2xl cursor-pointer"
+                        className="text-3xl cursor-pointer rounded-md hover:bg-gray-100 hover:scale-140 transition-transform duration-200 ease-in-out p-1"
                         onClick={() => setShowNotifications(prev => !prev)}
                     />
                     {hasUnread && (
@@ -100,7 +114,7 @@ export default function Header({ notifications, hasUnread, reloadNotifications }
                         />
                     ) : (
                         <FaUser
-                            className="text-2xl cursor-pointer"
+                            className="text-3xl cursor-pointer rounded-md hover:bg-gray-100 hover:scale-140 transition-transform duration-200 ease-in-out p-1"
                             onClick={() => setShowMenu(!showMenu)}
                         />
                     )}
