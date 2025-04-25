@@ -191,7 +191,7 @@ export default function DetailsAccount() {
                         <ArrowLeft className="h-4 w-4" />
                     </Link>
                 </Button>
-                <h1 className="text-2xl font-bold">Mi Perfil</h1>
+                <h1 className="text-2xl font-bold">Volver</h1>
             </div>
 
 
@@ -394,7 +394,7 @@ export default function DetailsAccount() {
                                     <div className="space-y-4">
                                         <div className="flex flex-wrap gap-2">
                                             {usuario.habilidades.map((habilidad, index) => (
-                                                <Badge key={index} fontVariant="secondary" className="text-sm py-1 px-3">
+                                                <Badge key={index} className="text-sm py-1 px-3">
                                                     {habilidad}
                                                     {editando.habilidades && (
                                                         <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => handleEliminarHabilidad(index)} />
@@ -440,7 +440,7 @@ export default function DetailsAccount() {
                                                 </div>
                                                 <div className="mt-3 flex flex-wrap gap-2">
                                                     {proyecto.tecnologias.map((tech, idx) => (
-                                                        <Badge key={idx} fontVariant="outline" className="text-xs">
+                                                        <Badge key={idx} className="text-sm py-1 px-3">
                                                             {tech}
                                                         </Badge>
                                                     ))}

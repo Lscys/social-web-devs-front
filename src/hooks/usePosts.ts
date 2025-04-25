@@ -5,6 +5,7 @@ export const usePosts = () => {
     return useInfiniteQuery({
         queryKey: ["posts"],
         queryFn: async ({ pageParam = 0 }: { pageParam: number }) => {
+            console.log("Fetching posts, page:", pageParam);
             const data = await PostService.getAllPosts(pageParam, 10);
             return data;
         },

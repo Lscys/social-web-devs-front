@@ -81,49 +81,55 @@ export default function PostCard({ post }: Props) {
     return (
         <div className="bg-white rounded-xl p-6 shadow-md mb-6 mr-4">
             {/* Header usuario */}
-            <div className="flex items-center gap-4 mb-4 justify-between">
-                {user.image ? (
-                    <img
-                        src={user.image}
-                        alt="User"
-                        className="w-12 h-12 rounded-full object-cover border border-gray-200"
-                    />
-                ) : (
-                    <FaUserCircle className="w-12 h-12 text-gray-400" />
-                )}
-                {/* ... dentro del header del post */}
-                <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-400">
-                        {formatDistanceToNow(new Date(createdAt), { addSuffix: true, locale: es })}
-                    </span>
-
-                    {currentUser?.iduser === post.user.iduser && (
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <button className="p-1 rounded-full hover:bg-gray-100">
-                                    <MoreHorizontal className="w-5 h-5 text-gray-500" />
-                                </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                {/* Se agrego esto ya que elimina un style pointer-events que se agrega automaticamente */}
-                                <DropdownMenuItem
-                                    onClick={() => {
-                                        requestAnimationFrame(() => {
-                                            onEdit(post);
-                                        });
-                                    }}
-                                >
-                                    <Pencil className="w-4 h-4 mr-2" />
-                                    Editar
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => onDelete(post.idrelease)}>
-                                    <Trash2 className="w-4 h-4 mr-2 text-red-500" />
-                                    Eliminar
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+            <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-4">
+                    {user.image ? (
+                        <img
+                            src={user.image}
+                            alt="User"
+                            className="w-12 h-12 rounded-full object-cover border border-gray-200"
+                        />
+                    ) : (
+                        <FaUserCircle className="w-12 h-12 text-gray-400" />
                     )}
+
+                    {/* Nombre y apellido del usuario */}
+                    <div className="flex flex-col">
+                        <span className="text-1xl font-medium text-gray-800">
+                            {user.name} {user.last_name}
+                        </span>
+                        <span className="text-xs text-gray-400">
+                            {formatDistanceToNow(new Date(createdAt), { addSuffix: true, locale: es })}
+                        </span>
+                    </div>
                 </div>
+
+                {/* Menú para editar/eliminar */}
+                {currentUser?.iduser === post.user.iduser && (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <button className="p-1 rounded-full hover:bg-gray-100">
+                                <MoreHorizontal className="w-5 h-5 text-gray-500" />
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                                onClick={() => {
+                                    requestAnimationFrame(() => {
+                                        onEdit(post);
+                                    });
+                                }}
+                            >
+                                <Pencil className="w-4 h-4 mr-2" />
+                                Editar
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => onDelete(post.idrelease)}>
+                                <Trash2 className="w-4 h-4 mr-2 text-red-500" />
+                                Eliminar
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                )}
             </div>
 
             {/* Título y descripción */}
