@@ -2,7 +2,7 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { TokenService } from '../api/token.service'; // Servicio para manejar el token
 import { ApiResponse } from '../interface/ApiResponse';
 
-const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+const baseURL = import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:8080';
 
 class ApiClient {
     private instance: AxiosInstance;

@@ -17,6 +17,8 @@ import { Badge } from '@/components/ui/badge';
 
 export default function DetailsAccount() {
     // En una aplicación real, estos datos vendrían de una base de datos
+    const { user: currentUser } = useAuth(); 
+    const nameComplete = currentUser?.name+" "+ currentUser?.last_name;
     const [usuario, setUsuario] = useState({
         nombre: "Ana Martínez",
         usuario: "ana_dev",
@@ -216,7 +218,7 @@ export default function DetailsAccount() {
                             <Avatar className="h-24 w-24">
                                 <AvatarImage src={usuario.imagen || "/placeholder.svg"} alt={usuario.nombre} />
                                 <AvatarFallback>
-                                    {usuario.nombre
+                                    {nameComplete
                                         .split(" ")
                                         .map((n) => n[0])
                                         .join("")}
@@ -247,8 +249,8 @@ export default function DetailsAccount() {
                                 </div>
                             ) : (
                                 <div className="text-center">
-                                    <h2 className="text-xl font-bold">{usuario.nombre}</h2>
-                                    <p className="text-muted-foreground">@{usuario.usuario}</p>
+                                    <h2 className="text-xl font-bold">{currentUser?.name+" "+currentUser?.last_name}</h2>
+                                    <p className="text-muted-foreground">@{currentUser?.usuario}</p>
                                     <Badge className="mt-2">{usuario.rol}</Badge>
                                 </div>
                             )}

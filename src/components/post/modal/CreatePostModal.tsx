@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/context/useAuth';
 import { useCreatePost } from '@/hooks/useCreatePost';
+import { uploadImageToCloudinary } from '@/service/api/uploadImage';
 import { PostRequest, Technologies } from '@/service/interface/Post';
 import { PostService } from '@/service/post/post.service';
 import { TechnologiesService } from '@/service/technologies/technologies.service';
@@ -24,8 +25,18 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ open, onClose }) => {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [technologies, setTechnologies] = useState<Technologies[]>();
-    const [image, setImage] = useState<string | null>(null);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [imageFile, setImageFile] = useState<File | null>(null);
     const [selectedTechnologies, setSelectedTechnologies] = useState<number[]>([]);
+    const [isUploading, setIsUploading] = useState(false);
+
+    const resetForm = () => {
+        setTitle("");
+        setDescription("");
+        setSelectedTechnologies([]);
+        setImagePreview(null);
+        setImageFile(null);
+    };
 
     // 🚀 Mutation de publicación
     const createPostMutation = useCreatePost(() => {
@@ -33,6 +44,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ open, onClose }) => {
             description: "Post publicado con éxito",
             duration: 4000,
         });
+        resetForm();
         onClose(); // Cierra el modal
     });
 
@@ -42,9 +54,10 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ open, onClose }) => {
         if (file) {
             const reader = new FileReader();
             reader.onloadend = () => {
-                setImage(reader.result as string); // Guardamos la imagen en el estado
+                setImagePreview(reader.result as string); // Guardamos la imagen en el estado
             };
             reader.readAsDataURL(file); // Leemos el archivo como una URL base64
+            setImageFile(file)
         }
     };
 
@@ -60,7 +73,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ open, onClose }) => {
         fetchTechnologies();
     }, [])
 
-    const onPushPost = (e: React.FormEvent) => {
+    const onPushPost = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!title || !description || !selectedTechnologies.length || !user?.iduser) {
@@ -71,33 +84,61 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ open, onClose }) => {
             return;
         }
 
+        let imageUrl = "";
+
+        if (imageFile) {
+            try {
+                setIsUploading(true);
+                imageUrl = await uploadImageToCloudinary(imageFile);
+            } catch (error) {
+                toast.error("Error subiendo imagen");
+                setIsUploading(false);
+                return;
+            }
+        }
+
+
         const data: PostRequest = {
             title,
             description,
             technologiesIds: selectedTechnologies,
             userId: user.iduser,
-            imageUrl: image ?? "",
+            imageUrl
         };
 
-        createPostMutation.mutate(data);
+        createPostMutation.mutate(data, {
+            onSuccess: () => {
+                setIsUploading(false); // Cuando se publique correctamente, dejamos de mostrar el estado de carga
+            },
+            onError: () => {
+                setIsUploading(false); // En caso de error, dejamos de mostrar el estado de carga
+            },
+        });
     };
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-2xl sm:w-full">
+            <DialogContent className="sm:max-w-2xl sm:w-full fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle className="text-center">Creando nueva publicacion</DialogTitle>
                 </DialogHeader>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="flex flex-col gap-4">
-                        <Input placeholder="Titulo" onChange={(e) => setTitle(e.target.value)} />
-                        <Textarea placeholder="Descripcion" className="resize-none h-32" onChange={(e) => setDescription(e.target.value)} />
+                        <Input placeholder="Titulo"
+                            onChange={(e) => setTitle(e.target.value)}
+                            disabled={createPostMutation.isPending}
+                        />
+                        <Textarea placeholder="Descripcion" className="resize-none h-32"
+                            onChange={(e) => setDescription(e.target.value)}
+                        />
                         <Select onValueChange={(value) => {
                             const id = Number(value);
                             if (!selectedTechnologies.includes(id)) {
                                 setSelectedTechnologies((prev) => [...prev, id]);
                             }
-                        }}>
+                        }}
+                            disabled={createPostMutation.isPending}
+                        >
                             <div className="flex flex-wrap gap-2 mt-2">
                                 {selectedTechnologies.map((techId) => {
                                     const tech = technologies?.find(t => t.idtech === techId);
@@ -140,21 +181,24 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ open, onClose }) => {
                         <Button
                             variant="outline"
                             onClick={() => document.getElementById('file-input')?.click()}
+                            disabled={createPostMutation.isPending}
                         >
                             Subir imagen
                         </Button>
 
                         {/* Si ya hay imagen, mostrarla */}
-                        {image ? (
+                        {imagePreview ? (
                             <div className="relative w-full h-full">
                                 <img
-                                    src={image}
+                                    src={imagePreview}
                                     alt="Vista previa"
                                     className="mt-4 w-full h-full object-cover rounded-lg"
                                 />
-
                                 <button
-                                    onClick={() => setImage(null)}
+                                    onClick={() => {
+                                        setImagePreview(null);
+                                        setImageFile(null);
+                                    }}
                                     className="absolute top-2 right-0.5 bg-black text-white px-2 py-1 text-xs rounded-2xl hover:bg-white hover:text-black transition duration-200"
                                 >
                                     <FaTimes />
@@ -180,13 +224,24 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ open, onClose }) => {
                 <div className="flex justify-end mt-4">
                     <Button
                         onClick={onPushPost}
-                        disabled={createPostMutation.isPending}
+                        disabled={isUploading}
                     >
-                        {createPostMutation.isPending ? "Publicando..." : "Publicar"}
+                        {isUploading ? "Publicando..." : "Publicar"}
                     </Button>
                 </div>
+                {isUploading && (
+                    <div className="fixed inset-0 bg-white/60 backdrop-blur-sm z-50 flex items-center justify-center rounded-xl">
+                        <div className="text-center flex flex-col items-center gap-2 z-50">
+                            <span className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-900" />
+                            <p className="text-sm text-gray-700">Publicando tu post...</p>
+                        </div>
+                    </div>
+                )}
+
             </DialogContent>
         </Dialog>
+
+
     );
 }
 
