@@ -5,12 +5,9 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import AppRoutes from "./routes"
 import { Toaster } from "sonner";
 
-
 export const queryClient = new QueryClient();
 
-
 function App() {
-
 
   return (
     <BrowserRouter>
